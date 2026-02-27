@@ -42,19 +42,17 @@ module rf #(
 
     always@(posedge i_clk) begin
         if(i_rst) begin
-          for(i=0; i<32; i += 1) begin
-            registers[i] <= 32'b0000_0000_0000_0000_0000_0000_0000_0000;
-          end
+            registers[0] <= 32'b0;
         end
-        else if(i_rd_wen && i_rd_waddr != 5'b0_0000) begin
+        else if(i_rd_wen & (i_rd_waddr != 5'b0_0000)) begin
           registers[i_rd_waddr] <= i_rd_wdata;
         end
     end
 
-    assign o_rs1_rdata = (BYPASS_EN & i_rd_wen & i_rd_waddr == i_rs1_raddr & i_rs1_raddr != 0) 
+    assign o_rs1_rdata = (|BYPASS_EN & i_rd_wen & (i_rd_waddr == i_rs1_raddr) & (i_rs1_raddr != 0)) 
         ? i_rd_wdata : registers[i_rs1_raddr];
     
-    assign o_rs2_rdata = (BYPASS_EN & i_rd_wen & i_rd_waddr == i_rs2_raddr & i_rs2_raddr != 0) 
+    assign o_rs2_rdata = (|BYPASS_EN & i_rd_wen & (i_rd_waddr == i_rs2_raddr) & (i_rs2_raddr != 0)) 
         ? i_rd_wdata : registers[i_rs2_raddr];
 
 endmodule

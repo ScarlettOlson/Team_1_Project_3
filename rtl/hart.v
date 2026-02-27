@@ -151,7 +151,10 @@ module hart #(
         .val1(current_ins_addr),
         .val2(32'b0000_0000_0000_0000_0000_0000_0000_0100),
         .carry_in(1'b0),
-        .val_out(incremented_pc)
+        .val_out(incremented_pc),
+        .carry_out(),
+        .prop_out(),
+        .gen_out()
     );
 
 
@@ -159,12 +162,12 @@ module hart #(
     // Setup Control Unit
     wire reg_wen;
     wire [5:0] inst_type;
-    wire [2:0] alu_op;
     wire [2:0] reg_write_mux_selector;
-    wire alu_sub;
-    wire alu_unsigned;
-    wire alu_arith;
     wire alu_op2_control;
+    wire [2:0] alu_opsel;
+    wire alu_sub;
+    wire alu_arith;
+    wire alu_unsigned;
     control_unit controlUnit(
         .opcode(i_imem_rdata[6:0]), 
         .funct3(i_imem_rdata[14:12]), 
@@ -174,7 +177,11 @@ module hart #(
         .reg_write_enable(reg_wen),
         .dmem_write_enable(o_dmem_wen),
         .dmem_read_enable(o_dmem_ren),
-        .i_format(inst_type)
+        .o_format(inst_type),
+        .o_opsel(alu_opsel),
+        .o_sub(alu_sub),
+        .o_arith(alu_arith),
+        .o_unsigned(alu_unsigned)
     );
 
     // Setup up register file connections
@@ -213,7 +220,7 @@ module hart #(
     wire alu_equal;
     wire alu_slt;
     alu ALU(
-        .i_opsel(alu_op),
+        .i_opsel(alu_opsel),
         .i_sub(alu_sub),
         .i_unsigned(alu_unsigned),
         .i_arith(alu_arith),
@@ -229,7 +236,10 @@ module hart #(
         .val1(current_ins_addr),
         .val2(immed),
         .carry_in(1'b0),
-        .val_out(incremented_pc)
+        .val_out(incremented_pc),
+        .carry_out(),
+        .prop_out(),
+        .gen_out()
     );
 
 
@@ -269,8 +279,8 @@ module hart #(
     wire [31:0] reg_write_select_1a;
     wire [31:0] reg_write_select_1b;
     wire [31:0] reg_write_select_2;
-    assign reg_wire_select_11 = reg_write_mux_selector[1] ? immed : alu_arith;
-    assign reg_wire_select_1b = reg_write_mux_selector[1] ? pc_plus_immed : dmem_shifted;
+    assign reg_write_select_1a = reg_write_mux_selector[1] ? immed : alu_result;
+    assign reg_write_select_1b = reg_write_mux_selector[1] ? pc_plus_immed : dmem_shifted;
     assign reg_write_select_2 = reg_write_mux_selector[0] ? reg_write_select_1a: reg_write_select_1b;
     assign rwr_data = reg_write_mux_selector[2] ? incremented_pc : reg_write_select_2;
 endmodule

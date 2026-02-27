@@ -1,11 +1,11 @@
 `default_nettype none
 
 module set_less_than (
-    input [31:0] val1,
-    input [31:0] val2,
-    input i_unsigned,
+    input wire [31:0] val1,
+    input wire [31:0] val2,
+    input wire i_unsigned,
 
-    output less_than
+    output wire less_than
 );
     wire [31:0] sub;
     wire [31:0] sub_op2 = val2 ^ {32{1'b1}};

@@ -9,8 +9,8 @@ module pc #(
     input  wire        i_rst,
 
 
-    input [31:0] i_next,
-    output [31:0]  o_current
+    input wire [31:0] i_next,
+    output wire [31:0]  o_current
 );
     reg [31:0] register;
 
@@ -26,4 +26,5 @@ module pc #(
     assign o_current = register;
 
 endmodule
-    
+
+`default_nettype wire    
