@@ -1,58 +1,71 @@
 `default_nettype none
 
-module control_unit(
-    input wire [6:0] opcode,
-    input wire [2:0] funct3,
-    input wire [6:0] funct7,
+module cntrUnit(
+    input wire          i_clk,
+    input wire          i_rst,
 
-    output wire alu_mux,
-    output wire [2:0] reg_write_mux,
-    output wire reg_write_enable,
-    output wire dmem_write_enable,
-    output wire dmem_read_enable,
-    output wire [5:0] o_format,
 
-    output wire [2:0] o_opsel,
-    output wire o_sub,
-    output wire o_arith,
-    output wire o_unsigned,
+    input wire [6:0]    i_opcode,
+    input wire [2:0]    i_funct3,
+    input wire [6:0]    i_funct7,
 
-    output wire o_halt,
+    // CONTROL SIGNALS
+    // Instruction Format
+    output wire [5:0]   o_format,
+    // Alu Control
+    output wire         o_alu_input_sel,
+    output wire [2:0]   o_alu_op_sel,
+    output wire         o_alu_sub_sel,
+    output wire         o_alu_sign_sel,
+    output wire         o_alu_arith_sel,
+    // PC Select Control
+    output wire         o_jump_type_sel, // Selects between pc+=signextend(immed) and pc = target
+    output wire         o_jump_sel,      // Informs branch controller if the instruction is a jump or branch type
+    // Data Memory Control
+    output wire         o_dmem_wr_en,
+    output wire         o_dmem_rd_en,
+    // Write Back Control
+    output wire [2:0]   o_reg_wr_sel
+    output wire         o_reg_wr_en,
 
-    output wire jump_type_mux
+    // HALT SIGNAL STOPS EXE
+    output wire         o_halt,
+
 );
+    // Gernerate Instruction Format
+    assign o_format[0] =        !opcode[2] & !opcode[3] & opcode[4] & opcode[5] & opcode[6];
+    assign o_format[1] =        !opcode[2] & opcode[4] & !opcode[5];
+    assign o_format[2] =        !opcode[2] & !opcode[3] & !opcode[4] & opcode[5];
+    assign o_format[3] =        !opcode[2] & !opcode[3] & !opcode[4] & opcode[5] & opcode[6];
+    assign o_format[4] =        opcode[2] & opcode[4];
+    assign o_format[5] =        opcode[3] &  opcode[6];
+
+    // ALU Control Signals
+    assign o_alu_input_sel =    (!opcode[2] & opcode[4] & !opcode[5]) | (opcode[2] & !opcode[3] & opcode[6]) | (!opcode[6] & opcode[5] & !opcode[4]);
+    assign o_alu_op_sel[0] =    (funct3[0] | (funct3[1] & !funct3[2])) & opcode[4] & !opcode[2];
+    assign o_alu_op_sel[1] =    funct3[1] & opcode[4] & opcode[5] & !opcode[2];
+    assign o_alu_op_sel[2] =    funct3[2] & opcode[4] & opcode[5] & !opcode[2];
+    assign o_alu_sub_sel =      opcode[4] & opcode[5] & funct7[5];
+    assign o_alu_sign_sel =     opcode[4] & funct3[0];
+    assign o_alu_arith_sel =    opcode[4] & funct7[5];
+
+    // PC Select Control
+    assign o_jump_type_sel =    opcode[6] & opcode[5] & !opcode[3] & opcode[2];
+    assign o_jump_sel =         opcode[6] & opcode[5] & opcode[2];
+
+    // Data Memory Control
+    assign o_dmem_wr_en =       o_format[2];
+    assign o_dmem_rd_en =       !opcode[4] & !opcode[5];
+
+    // Write Back Control
+    assign o_reg_wr_sel[0] =    opcode[5] & !opcode[6];
+    assign o_reg_wr_sel[1] =    opcode[3] & !opcode[6];
+    assign o_reg_wr_sel[2] =    opcode[6];
+    assign o_reg_wr_en =        o_format[1] | o_format[4] | o_format[5];
+
+
     // Determine if the instruction is a halt 
     assign o_halt = opcode[6] & opcode[5] & opcode[4];
-
-    // ALU Input Mux
-    assign alu_mux = (!opcode[2] & opcode[4] & !opcode[5]) | (opcode[2] & !opcode[3] & opcode[6]) | (!opcode[6] & opcode[5] & !opcode[4]);
-
-    // Register Write Input Selection
-    assign reg_write_mux[0] =  opcode[5] & !opcode[6];
-    assign reg_write_mux[1] =  opcode[3] & !opcode[6];
-    assign reg_write_mux[2] =  opcode[6];
-
-    // Gernerate Instruction Format
-    assign o_format[0] = !opcode[2] & !opcode[3] & opcode[4] & opcode[5] & opcode[6];
-    assign o_format[1] = !opcode[2] & opcode[4] & !opcode[5];
-    assign o_format[2] = !opcode[2] & !opcode[3] & !opcode[4] & opcode[5];
-    assign o_format[3] = !opcode[2] & !opcode[3] & !opcode[4] & opcode[5] & opcode[6];
-    assign o_format[4] = opcode[2] & opcode[4];
-    assign o_format[5] = opcode[3] &  opcode[6];
-
-    assign reg_write_enable = o_format[1] | o_format[4] | o_format[5];
-
-    assign dmem_write_enable = o_format[2];
-    assign dmem_read_enable  = !opcode[4] & !opcode[5];
-
-    assign o_sub = opcode[4] & opcode[5] & funct7[5];
-    assign o_arith = opcode[4] & funct7[5];
-    assign o_unsigned = opcode[4] & funct3[0];
-    assign o_opsel[0] = (funct3[0] | (funct3[1] & !funct3[2])) & opcode[4] & !opcode[2];
-    assign o_opsel[1] = funct3[1] & opcode[4] & opcode[5] & !opcode[2];
-    assign o_opsel[2] = funct3[2] & opcode[4] & opcode[5] & !opcode[2];
-
-    assign jump_type_mux = opcode[6] & opcode[5] & !opcode[3] & opcode[2];
    
 
 endmodule

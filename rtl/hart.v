@@ -132,134 +132,102 @@ module hart #(
     ,`RVFI_OUTPUTS,
 `endif
 );
-    // Setup Program Counter
-    wire [31:0] next_ins_addr;
-    wire [31:0] current_ins_addr;
-    pc programCounter(
+    wire [31:0] exe_instr;      // The Instruction to execute this cycle
+    wire [31:0] next_instr_addr;// The Address of the subsequent instruction
+    wire [31:0] jump_instr_addr;// The Instruction to jump to if branch is taken 
+    wire        jump_sel;       // Both Jump pieces are determined during the exe phase
+    // Instruction Fetch Phase
+    instrFetch instructionFetch(
         .i_clk(i_clk),
         .i_rst(i_rst),
-        .i_next(next_ins_addr),
-        .o_current(current_ins_addr)
-    );
 
-    // Get Instruction from I-Memery
-    assign o_imem_raddr = current_ins_addr;
-    wire [31:0] instruction;
-    assign instruction = i_imem_rdata;
+        .o_imem_addr(o_imem_addr),
+        .i_imem_rdata(i_imem_rdata),
 
-    // Increment PC by 4
-    wire [31:0] incremented_pc;
-    add_pg_32 pcAdder(
-        .val1(current_ins_addr),
-        .val2(32'b0000_0000_0000_0000_0000_0000_0000_0100),
-        .carry_in(1'b0),
-        .val_out(incremented_pc),
-        .carry_out(),
-        .prop_out(),
-        .gen_out()
-    );
+        .i_next_instr_addr(next_instr_addr),
+        .i_jump_instr_addr(jump_instr_addr),
+        .i_jump_sel(jump_sel)
 
-
-
-    // Setup Control Unit
-    wire reg_wen;
-    wire [5:0] inst_type;
-    wire [2:0] reg_write_mux_selector;
-    wire alu_op2_control;
-    wire [2:0] alu_opsel;
-    wire alu_sub;
-    wire alu_arith;
-    wire alu_unsigned;
-    wire halt;
-    wire jump_mux_cntr;
-    control_unit controlUnit(
-        .opcode(i_imem_rdata[6:0]), 
-        .funct3(i_imem_rdata[14:12]), 
-        .funct7(i_imem_rdata[31:25]),
-        .alu_mux(alu_op2_control),
-        .reg_write_mux(reg_write_mux_selector),
-        .reg_write_enable(reg_wen),
-        .dmem_write_enable(o_dmem_wen),
-        .dmem_read_enable(o_dmem_ren),
-        .o_format(inst_type),
-        .o_opsel(alu_opsel),
-        .o_sub(alu_sub),
-        .o_arith(alu_arith),
-        .o_unsigned(alu_unsigned),
-        .o_halt(halt),
-        .jump_type_mux(jump_mux_cntr)
-    );
-
-    // Setup up register file connections
-    wire [31:0] rs1_data;
-    wire [31:0] rs2_data;
-    wire [31:0] rwr_data;
-    rf registerFile(
-        .i_clk(i_clk),
-        .i_rst(i_rst),
-        .i_rs1_raddr(instruction[19:15]),
-        .o_rs1_rdata(rs1_data),
-        .i_rs2_raddr(instruction[24:20]),
-        .o_rs2_rdata(rs2_data),
-        .i_rd_wen(reg_wen),
-        .i_rd_waddr(instruction[11:7]),
-        .i_rd_wdata(rwr_data)
+        .instr(exe_instr),
+        .incr_instr_addr(incr_instr_addr)
     );
     
-    // Setup Immediate Generator
+    // Instruction Decode Phase
+    wire [31:0] reg_wr_data;        // This Value is selected later, in the Write Back Phase
+    wire [31:0] reg_rs1_data;
+    wire [31:0] reg_rs2_data;
     wire [31:0] immed;
-    imm immediateGenerator(
-        .i_inst(instruction),
-        .i_format(inst_type),
-        .o_immediate(immed)
+    wire        alu_input_sel;
+    wire [2:0]  alu_op_sel;
+    wire        alu_sub_sel;
+    wire        alu_sign_sel;
+    wire        alu_arith_sel;
+    wire        jump_type_sel;
+    wire        jump_sel;
+    wire [3:0]  dmem_mask;
+    wire        dmem_wr_en;
+    wire        dmem_rd_en;
+    wire [2:0]  reg_wr_sel;
+    wire [2:0]  funct3;
+    wire [6:0]  funct7;
+
+    instrDecode instructionDecode(
+        .i_clk(i_clk),
+        .i_rst(i_rst),
+
+        .i_instr(exe_instr),
+        .i_reg_wr_data(reg_wr_data),
+
+        .o_reg_data_1(reg_rs1_data),
+        .o_reg_data_2(reg_rs2_data),
+        .o_immed(immed),
+
+        .o_alu_input_sel(alu_input_sel),
+        .o_alu_op_sel(alu_op_sel),
+        .o_alu_sub_sel(alu_sub_sel),
+        .o_alu_sign_sel(alu_sign_sel),
+        .o_alu_arith_sel(alu_arith_sel),
+
+        .o_jump_type_sel(jump_type_sel),
+        .o_jump_sel(jump_sel),
+
+        .o_dmem_mask(.o_dmem_mask),
+        .o_dmem_wr_en(.o_dmem_wen),
+        .o_dmem_rd_en(.o_dmem_ren),
+
+        .o_reg_wr_sel(reg_wr_sel),
+        .o_halt(.o_retire_halt),
+
+        .o_funct3(funct3),
+        .o_funct7(funct7)
     );
-
-
-
-
-    // Setp ALU
-    wire [31:0] alu_op1;
-    wire [31:0] alu_op2;
-    assign alu_op1 = rs1_data;
-    assign alu_op2 = (alu_op2_control) ? immed : rs2_data;
+    
+    // Execution Phase
     wire [31:0] alu_result;
-    wire alu_equal;
-    wire alu_slt;
-    alu ALU(
-        .i_opsel(alu_opsel),
-        .i_sub(alu_sub),
-        .i_unsigned(alu_unsigned),
-        .i_arith(alu_arith),
-        .i_op1(alu_op1),
-        .i_op2(alu_op2),
-        .o_result(alu_result),
-        .o_eq(alu_equal),
-        .o_slt(alu_slt)
-    );
+    wire [31:0] jump_instr_addr;
+    exe execution(
+        .i_clk(i_clk),
+        .i_rst(i_rst),
 
-    wire [31:0] pc_plus_immed;
-    add_pg_32 pc_immediate_adder(
-        .val1(current_ins_addr),
-        .val2(immed),
-        .carry_in(1'b0),
-        .val_out(pc_plus_immed),
-        .carry_out(),
-        .prop_out(),
-        .gen_out()
-    );
+        .i_alu_input_sel(alu_input_sel),
+        .i_alu_op_sel(alu_op_sel),
+        .i_alu_sub_sel(alu_sub_sel),
+        .i_alu_sign_sel(alu_sign_sel),
+        .i_alu_arith_sel(alu_arith_sel),
+        
+        .i_jump_type_sel(jump_type_sel),
+        .i_jump_sel(jump_sel),
+        .i_funct3(funct3),
 
-    wire [31:0] jump_inst_addr;
-    assign jump_inst_addr = jump_mux_cntr ? {alu_result[31:1], 1'b0} : pc_plus_immed;
+        .i_reg_rs1_data(reg_rs1_data),
+        .i_reg_rs2_data(reg_rs2_data),
+        .i_immed(immed),
+        .i_instr(o_retire_inst),
 
-    wire takeBranch;
-    b_cntr branchControler(
-        .jump(inst_type[5]),
-        .funct3(i_imem_rdata[14:12]),
-        .i_eq(alu_equal),
-        .i_slt(alu_slt),
-        .jump_cntr(takeBranch)
+        .o_alu_result(alu_result),
+        .o_jump_addr(jump_inst_addr),
+        .o_jump_sel(jump_sel)
     );
-    assign next_ins_addr = (takeBranch) ? jump_inst_addr : incremented_pc;
 
 
 

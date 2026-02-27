@@ -1,12 +1,13 @@
 `default_nettype none
 
 module b_cntr(
-    input wire jump,
-    input wire [2:0] funct3,
-    input wire i_eq,
-    input wire i_slt,
+    input wire          i_jump,
+    input wire [2:0]    i_funct3,
 
-    output wire jump_cntr
+    input wire          i_eq,
+    input wire          i_slt,
+
+    output wire         o_jump_cntr
 );
     wire branchTaken;
     assign branchTaken =    (funct3 == 3'b000) ? i_eq :
