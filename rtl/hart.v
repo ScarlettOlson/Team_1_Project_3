@@ -130,7 +130,43 @@ module hart #(
     ,`RVFI_OUTPUTS,
 `endif
 );
+
+    wire i_jump_mux;
+    wire i_branch_mux;
+    wire i_alu_mux_1, i_alu_mux_2;
+    wire [2:0] i_reg_write_mux;
+    wire i_branch_type_mux;
+    wire i_reg_write_enable;
+    wire i_dmem_write_en;
+    wire i_dmem_read_en;
+    wire [5:0] i_format;
+
     // Fill in your implementation here.
+    control_unit i_cntr(.opcode(i_imem_rdata[6:0]), 
+                        .funct3(i_imem_rdata[14:12]), 
+                        .funct7(i_imem_rdata[31:25]), 
+                        .jump_mux(i_jump_mux), 
+                        .branch_mux(i_branch_mux), 
+                        .alu_mux_1(i_alu_mux_1),
+                        .alu_mux_2(i_alu_mux_2),
+                        .reg_write_mux(i_reg_write_mux), 
+                        .branch_type_mux(i_branch_type_mux),
+                        .reg_write_enable(i_reg_write_enable),
+                        .dmem_write_enable(i_dmem_write_en),
+                        .dmem_read_enable(i_dmem_read_en),
+                        .i_format(i_format));
+
+    datapath i_datapath(.clk(i_clk), .rst(i_rst), );
+
+    always (@posedge clk, rst) begin
+
+        if (rst) begin
+            o_imem_raddr = RESET_ADDR;
+        end
+
+
+
+    end
 endmodule
 
 `default_nettype wire
