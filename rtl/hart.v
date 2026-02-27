@@ -163,7 +163,8 @@ module hart #(
                         .dmen_wdata(o_dmem_wdata),
                         .dmem_rdata(i_dmem_rdata),
                         .imem_rdata(i_imem_rdata),
-                        .imem_addr(o_imem_raddr));
+                        .imem_addr(o_imem_raddr),
+                        );
 
     always (@posedge clk, rst) begin
 
