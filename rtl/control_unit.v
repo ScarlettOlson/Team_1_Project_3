@@ -17,7 +17,9 @@ module control_unit(
     output wire o_arith,
     output wire o_unsigned,
 
-    output wire o_halt
+    output wire o_halt,
+
+    output wire jump_type_mux
 );
     // Determine if the instruction is a halt 
     assign o_halt = opcode[6] & opcode[5] & opcode[4];
@@ -49,6 +51,8 @@ module control_unit(
     assign o_opsel[0] = (funct3[0] | (funct3[1] & !funct3[2])) & opcode[4] & !opcode[2];
     assign o_opsel[1] = funct3[1] & opcode[4] & opcode[5] & !opcode[2];
     assign o_opsel[2] = funct3[2] & opcode[4] & opcode[5] & !opcode[2];
+
+    assign jump_type_mux = opcode[6] & opcode[5] & !opcode[3] & opcode[2];
    
 
 endmodule

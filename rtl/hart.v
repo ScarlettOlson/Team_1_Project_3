@@ -1,3 +1,5 @@
+`default_nettype none
+
 module hart #(
     // After reset, the program counter (PC) should be initialized to this
     // address and start executing instructions from there.
@@ -169,6 +171,7 @@ module hart #(
     wire alu_arith;
     wire alu_unsigned;
     wire halt;
+    wire jump_mux_cntr;
     control_unit controlUnit(
         .opcode(i_imem_rdata[6:0]), 
         .funct3(i_imem_rdata[14:12]), 
@@ -183,7 +186,8 @@ module hart #(
         .o_sub(alu_sub),
         .o_arith(alu_arith),
         .o_unsigned(alu_unsigned),
-        .o_halt(halt)
+        .o_halt(halt),
+        .jump_type_mux(jump_mux_cntr)
     );
 
     // Setup up register file connections
@@ -238,11 +242,24 @@ module hart #(
         .val1(current_ins_addr),
         .val2(immed),
         .carry_in(1'b0),
-        .val_out(incremented_pc),
+        .val_out(pc_plus_immed),
         .carry_out(),
         .prop_out(),
         .gen_out()
     );
+
+    wire [31:0] jump_inst_addr;
+    assign jump_inst_addr = jump_mux_cntr ? {alu_result[31:1], 1'b0} : pc_plus_immed;
+
+    wire takeBranch;
+    b_cntr branchControler(
+        .jump(inst_type[5]),
+        .funct3(i_imem_rdata[14:12]),
+        .i_eq(alu_equal),
+        .i_slt(alu_slt),
+        .jump_cntr(takeBranch)
+    );
+    assign next_ins_addr = (takeBranch) ? jump_inst_addr : incremented_pc;
 
 
 
