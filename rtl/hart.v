@@ -156,7 +156,14 @@ module hart #(
                         .dmem_read_enable(i_dmem_read_en),
                         .i_format(i_format));
 
-    datapath i_datapath(.clk(i_clk), .rst(i_rst), );
+    datapath i_datapath(.clk(i_clk), .rst(i_rst), 
+                        .imem_addr(o_imem_raddr), 
+                        .imem_rdata(i_imem_rdata), 
+                        .dmem_addr(o_dmem_addr), 
+                        .dmen_wdata(o_dmem_wdata),
+                        .dmem_rdata(i_dmem_rdata),
+                        .imem_rdata(i_imem_rdata),
+                        .imem_addr(o_imem_raddr));
 
     always (@posedge clk, rst) begin
 
