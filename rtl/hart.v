@@ -168,6 +168,7 @@ module hart #(
     wire alu_sub;
     wire alu_arith;
     wire alu_unsigned;
+    wire halt;
     control_unit controlUnit(
         .opcode(i_imem_rdata[6:0]), 
         .funct3(i_imem_rdata[14:12]), 
@@ -181,7 +182,8 @@ module hart #(
         .o_opsel(alu_opsel),
         .o_sub(alu_sub),
         .o_arith(alu_arith),
-        .o_unsigned(alu_unsigned)
+        .o_unsigned(alu_unsigned),
+        .o_halt(halt)
     );
 
     // Setup up register file connections
@@ -283,6 +285,26 @@ module hart #(
     assign reg_write_select_1b = reg_write_mux_selector[1] ? pc_plus_immed : dmem_shifted;
     assign reg_write_select_2 = reg_write_mux_selector[0] ? reg_write_select_1a: reg_write_select_1b;
     assign rwr_data = reg_write_mux_selector[2] ? incremented_pc : reg_write_select_2;
+
+
+
+    // Test Bench output signals
+    assign o_retire_valid     = 1'b1;
+    assign o_retire_inst      = instruction;
+    assign o_retire_trap      = 1'b0;      
+    assign o_retire_halt      = halt;
+
+    assign o_retire_rs1_raddr = instruction[19:15];
+    assign o_retire_rs2_raddr = instruction[24:20];
+    assign o_retire_rs1_rdata = rs1_data;
+    assign o_retire_rs2_rdata = rs2_data;
+
+    assign o_retire_rd_waddr  = instruction[11:7];
+    assign o_retire_rd_wdata  = rwr_data;
+
+    assign o_retire_pc        = current_ins_addr;
+    assign o_retire_next_pc   = next_ins_addr;
+
 endmodule
 
 `default_nettype wire

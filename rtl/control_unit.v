@@ -15,8 +15,12 @@ module control_unit(
     output wire [2:0] o_opsel,
     output wire o_sub,
     output wire o_arith,
-    output wire o_unsigned
+    output wire o_unsigned,
+
+    output wire o_halt
 );
+    // Determine if the instruction is a halt 
+    assign o_halt = opcode[6] & opcode[5] & opcode[4];
 
     // ALU Input Mux
     assign alu_mux = (!opcode[2] & opcode[4] & !opcode[5]) | (opcode[2] & !opcode[3] & opcode[6]) | (!opcode[6] & opcode[5] & !opcode[4]);
@@ -42,7 +46,7 @@ module control_unit(
     assign o_sub = opcode[4] & opcode[5] & funct7[5];
     assign o_arith = opcode[4] & funct7[5];
     assign o_unsigned = opcode[4] & funct3[0];
-    assign o_opsel[0] = (funct3[0] | funct3[1] & !funct3[2]) & opcode[4] & !opcode[2];
+    assign o_opsel[0] = (funct3[0] | (funct3[1] & !funct3[2])) & opcode[4] & !opcode[2];
     assign o_opsel[1] = funct3[1] & opcode[4] & opcode[5] & !opcode[2];
     assign o_opsel[2] = funct3[2] & opcode[4] & opcode[5] & !opcode[2];
    
