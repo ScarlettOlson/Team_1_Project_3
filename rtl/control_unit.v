@@ -12,7 +12,7 @@ module control_unit(
 );
 
     // ALU Input Mux
-    assign alu_mux = !opcode[2] & opcode[4] & !opcode[5] | opcode[2] & !opcode[3] & opcode[6] | !opcode[6] & opcode[5] & !opcode[4];
+    assign alu_mux = (!opcode[2] & opcode[4] & !opcode[5]) | (opcode[2] & !opcode[3] & opcode[6]) | (!opcode[6] & opcode[5] & !opcode[4]);
 
     // Register Write Input Selection
     assign reg_write_mux[0] =  opcode[5] & !opcode[6];
