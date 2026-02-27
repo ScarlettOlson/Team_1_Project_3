@@ -168,7 +168,7 @@ module hart #(
                         .alu_src(i_alu_mux_2),
                         .mem_ren(i_dmem_read_en),
                         .mem_wen(i_dmem_read_en),
-                        .pc_sel(i_jump_mux),
+                        .pc_sel(i_branch_mux),
                         );
 
     always (@posedge clk, rst) begin
