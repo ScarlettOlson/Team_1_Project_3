@@ -164,6 +164,11 @@ module hart #(
                         .dmem_rdata(i_dmem_rdata),
                         .imem_rdata(i_imem_rdata),
                         .imem_addr(o_imem_raddr),
+                        .reg_wen(i_reg_write_enable),
+                        .alu_src(i_alu_mux_2),
+                        .mem_ren(i_dmem_read_en),
+                        .mem_wen(i_dmem_read_en),
+                        .pc_sel(i_jump_mux),
                         );
 
     always (@posedge clk, rst) begin
