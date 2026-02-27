@@ -15,7 +15,7 @@ module imm (
     // [3] B-type
     // [4] U-type
     // [5] J-type
-    input  wire [ 5:0] i_format,
+    input  wire [5:0] i_format,
     // Output 32-bit sign-extended immediate.
     // NOTE: Because the R-type format does not have an immediate, the output
     // immediate can be treated as a don't-care under this case. It is included

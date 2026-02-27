@@ -130,56 +130,149 @@ module hart #(
     ,`RVFI_OUTPUTS,
 `endif
 );
+    // Setup Program Counter
+    wire [31:0] next_ins_addr;
+    wire [31:0] current_ins_addr;
+    pc programCounter(
+        .i_clk(i_clk),
+        .i_rst(i_rst),
+        .i_next(next_ins_addr),
+        .o_current(current_ins_addr)
+    );
 
-    wire i_jump_mux;
-    wire i_branch_mux;
-    wire i_alu_mux_1, i_alu_mux_2;
-    wire [2:0] i_reg_write_mux;
-    wire i_branch_type_mux;
-    wire i_reg_write_enable;
-    wire i_dmem_write_en;
-    wire i_dmem_read_en;
-    wire [5:0] i_format;
+    // Get Instruction from I-Memery
+    assign o_imem_raddr = current_ins_addr;
+    wire [31:0] instruction;
+    assign instruction = i_imem_rdata;
 
-    // Fill in your implementation here.
-    control_unit i_cntr(.opcode(i_imem_rdata[6:0]), 
-                        .funct3(i_imem_rdata[14:12]), 
-                        .funct7(i_imem_rdata[31:25]), 
-                        .jump_mux(i_jump_mux), 
-                        .branch_mux(i_branch_mux), 
-                        .alu_mux_1(i_alu_mux_1),
-                        .alu_mux_2(i_alu_mux_2),
-                        .reg_write_mux(i_reg_write_mux), 
-                        .branch_type_mux(i_branch_type_mux),
-                        .reg_write_enable(i_reg_write_enable),
-                        .dmem_write_enable(i_dmem_write_en),
-                        .dmem_read_enable(i_dmem_read_en),
-                        .i_format(i_format));
-
-    datapath i_datapath(.clk(i_clk), .rst(i_rst), 
-                        .imem_addr(o_imem_raddr), 
-                        .imem_rdata(i_imem_rdata), 
-                        .dmem_addr(o_dmem_addr), 
-                        .dmen_wdata(o_dmem_wdata),
-                        .dmem_rdata(i_dmem_rdata),
-                        .imem_rdata(i_imem_rdata),
-                        .imem_addr(o_imem_raddr),
-                        .reg_wen(i_reg_write_enable),
-                        .alu_src(i_alu_mux_2),
-                        .mem_ren(i_dmem_read_en),
-                        .mem_wen(i_dmem_read_en),
-                        .pc_sel(i_jump_mux),
-                        );
-
-    always (@posedge clk, rst) begin
-
-        if (rst) begin
-            o_imem_raddr = RESET_ADDR;
-        end
+    // Increment PC by 4
+    wire [31:0] incremented_pc;
+    add_pg_32 pcAdder(
+        .val1(current_ins_addr),
+        .val2(32'b0000_0000_0000_0000_0000_0000_0000_0100),
+        .carry_in(1'b0),
+        .val_out(incremented_pc)
+    );
 
 
 
-    end
+    // Setup Control Unit
+    wire reg_wen;
+    wire [5:0] inst_type;
+    wire [2:0] alu_op;
+    wire [2:0] reg_write_mux_selector;
+    wire alu_sub;
+    wire alu_unsigned;
+    wire alu_arith;
+    wire alu_op2_control;
+    control_unit controlUnit(
+        .opcode(i_imem_rdata[6:0]), 
+        .funct3(i_imem_rdata[14:12]), 
+        .funct7(i_imem_rdata[31:25]),
+        .alu_mux(alu_op2_control),
+        .reg_write_mux(reg_write_mux_selector),
+        .reg_write_enable(reg_wen),
+        .dmem_write_enable(o_dmem_wen),
+        .dmem_read_enable(o_dmem_ren),
+        .i_format(inst_type)
+    );
+
+    // Setup up register file connections
+    wire [31:0] rs1_data;
+    wire [31:0] rs2_data;
+    wire [31:0] rwr_data;
+    rf registerFile(
+        .i_clk(i_clk),
+        .i_rst(i_rst),
+        .i_rs1_raddr(instruction[19:15]),
+        .o_rs1_rdata(rs1_data),
+        .i_rs2_raddr(instruction[24:20]),
+        .o_rs2_rdata(rs2_data),
+        .i_rd_wen(reg_wen),
+        .i_rd_waddr(instruction[11:7]),
+        .i_rd_wdata(rwr_data)
+    );
+    
+    // Setup Immediate Generator
+    wire [31:0] immed;
+    imm immediateGenerator(
+        .i_inst(instruction),
+        .i_format(inst_type),
+        .o_immediate(immed)
+    );
+
+
+
+
+    // Setp ALU
+    wire [31:0] alu_op1;
+    wire [31:0] alu_op2;
+    assign alu_op1 = rs1_data;
+    assign alu_op2 = (alu_op2_control) ? immed : rs2_data;
+    wire [31:0] alu_result;
+    wire alu_equal;
+    wire alu_slt;
+    alu ALU(
+        .i_opsel(alu_op),
+        .i_sub(alu_sub),
+        .i_unsigned(alu_unsigned),
+        .i_arith(alu_arith),
+        .i_op1(alu_op1),
+        .i_op2(alu_op2),
+        .o_result(alu_result),
+        .o_eq(alu_equal),
+        .o_slt(alu_slt)
+    );
+
+    wire [31:0] pc_plus_immed;
+    add_pg_32 pc_immediate_adder(
+        .val1(current_ins_addr),
+        .val2(immed),
+        .carry_in(1'b0),
+        .val_out(incremented_pc)
+    );
+
+
+
+    // Setup up Data Memory
+    wire [4:0] shift_amt;
+    assign shift_amt = {rs2_data[1:0], 3'b000};
+    wire [31:0] write_val;
+    shifter memInputShifter(
+        .val(rs2_data),
+        .shamt(shift_amt),
+        .shift_right(1'b1),
+        .shift_arith(1'b0),
+        .shifted_val(write_val)
+    );
+
+    assign o_dmem_addr = {rs2_data[31:2], 2'b00};
+    assign o_dmem_wdata = write_val;
+
+    mem_control memoryMaskGenerator(
+        .funct3(i_imem_rdata[14:12]),
+        .pos(rs2_data[1:0]),
+        .dmem_mask(o_dmem_mask)
+    );
+
+    wire zero_extend;
+    assign zero_extend = !i_imem_rdata[14];
+    wire [31:0] dmem_shifted;
+    shifter memoryOutputShifter(
+        .val(i_dmem_rdata),
+        .shamt(shift_amt),
+        .shift_right(1'b1),
+        .shift_arith(zero_extend),
+        .shifted_val(dmem_shifted)
+    );
+
+    wire [31:0] reg_write_select_1a;
+    wire [31:0] reg_write_select_1b;
+    wire [31:0] reg_write_select_2;
+    assign reg_wire_select_11 = reg_write_mux_selector[1] ? immed : alu_arith;
+    assign reg_wire_select_1b = reg_write_mux_selector[1] ? pc_plus_immed : dmem_shifted;
+    assign reg_write_select_2 = reg_write_mux_selector[0] ? reg_write_select_1a: reg_write_select_1b;
+    assign rwr_data = reg_write_mux_selector[2] ? incremented_pc : reg_write_select_2;
 endmodule
 
 `default_nettype wire
