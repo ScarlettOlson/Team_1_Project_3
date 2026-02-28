@@ -191,7 +191,6 @@ module hart #(
         .o_jump_type_sel(jump_type_sel),
         .o_jump_sel(jump_sel),
 
-        .o_dmem_mask(.o_dmem_mask),
         .o_dmem_wr_en(.o_dmem_wen),
         .o_dmem_rd_en(.o_dmem_ren),
 
@@ -205,6 +204,7 @@ module hart #(
     // Execution Phase
     wire [31:0] alu_result;
     wire [31:0] jump_instr_addr;
+    wire [31:0] pc_immed;
     exe execution(
         .i_clk(i_clk),
         .i_rst(i_rst),
@@ -226,69 +226,49 @@ module hart #(
 
         .o_alu_result(alu_result),
         .o_jump_addr(jump_inst_addr),
+        .o_pc_immed(pc_immed),
         .o_jump_sel(jump_sel)
     );
 
 
 
-    // Setup up Data Memory
-    wire [4:0] shift_amt;
-    assign shift_amt = {rs2_data[1:0], 3'b000};
-    wire [31:0] write_val;
-    shifter memInputShifter(
-        .val(rs2_data),
-        .shamt(shift_amt),
-        .shift_right(1'b1),
-        .shift_arith(1'b0),
-        .shifted_val(write_val)
+    // Memory Phase
+    wire [31:0]  shifter_mem_data;
+    mem memory(
+        .i_clk(i_clk),
+        .i_rst(i_rst),
+
+        .i_dmem_rd_en(dmem_rd_en),
+        .i_dmem_wr_en(dmem_wr_en),
+        .i_funct3(funct3),
+        .i_zero_extend(mem_zero_extend),
+
+        .o_dmem_wdata(.o_dmem_wdata),
+        .o_dmem_mask(.o_dmem_mask),
+        .i_dmem_rdata(.i_dmem_rdata),
+
+        .i_alu_result(alu_result),
+        .i_reg_rs2_data(reg_rs2_data),
+
+        .o_dmem_data(shifted_mem_data),
     );
 
-    assign o_dmem_addr = {rs2_data[31:2], 2'b00};
-    assign o_dmem_wdata = write_val;
+    // Write Back Phase
+    wrBack writeBack(
+        .i_clk(i_clk),
+        .i_rst(i_rst),
 
-    mem_control memoryMaskGenerator(
-        .funct3(i_imem_rdata[14:12]),
-        .pos(rs2_data[1:0]),
-        .dmem_mask(o_dmem_mask)
+        .i_reg_wr_sel(reg_wr_sel),
+
+        .i_alu_result(alu_result),
+        .i_shifter_mem_data(shifted_mem_data),
+        .i_pc_immed(pc_immed),
+        .i_immed(immed),
+        .i_next_pc_addr(next_instr_addr),
+
+        .o_wr_back_data(reg_wr_data)
     );
 
-    wire zero_extend;
-    assign zero_extend = !i_imem_rdata[14];
-    wire [31:0] dmem_shifted;
-    shifter memoryOutputShifter(
-        .val(i_dmem_rdata),
-        .shamt(shift_amt),
-        .shift_right(1'b1),
-        .shift_arith(zero_extend),
-        .shifted_val(dmem_shifted)
-    );
-
-    wire [31:0] reg_write_select_1a;
-    wire [31:0] reg_write_select_1b;
-    wire [31:0] reg_write_select_2;
-    assign reg_write_select_1a = reg_write_mux_selector[1] ? immed : alu_result;
-    assign reg_write_select_1b = reg_write_mux_selector[1] ? pc_plus_immed : dmem_shifted;
-    assign reg_write_select_2 = reg_write_mux_selector[0] ? reg_write_select_1a: reg_write_select_1b;
-    assign rwr_data = reg_write_mux_selector[2] ? incremented_pc : reg_write_select_2;
-
-
-
-    // Test Bench output signals
-    assign o_retire_valid     = 1'b1;
-    assign o_retire_inst      = instruction;
-    assign o_retire_trap      = 1'b0;      
-    assign o_retire_halt      = halt;
-
-    assign o_retire_rs1_raddr = instruction[19:15];
-    assign o_retire_rs2_raddr = instruction[24:20];
-    assign o_retire_rs1_rdata = rs1_data;
-    assign o_retire_rs2_rdata = rs2_data;
-
-    assign o_retire_rd_waddr  = instruction[11:7];
-    assign o_retire_rd_wdata  = rwr_data;
-
-    assign o_retire_pc        = current_ins_addr;
-    assign o_retire_next_pc   = next_ins_addr;
 
 endmodule
 

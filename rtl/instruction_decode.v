@@ -23,7 +23,6 @@ module instrDecode(
     output wire         o_jump_type_sel, // Selects between pc+=signextend(immed) and pc = target
     output wire         o_jump_sel,      // Informs branch controller if the instruction is a jump or branch type
     // Data Memory Control
-    output wire [3:0]   o_dmem_mask,
     output wire         o_dmem_wr_en,
     output wire         o_dmem_rd_en,
     // Write Back Control

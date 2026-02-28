@@ -24,6 +24,7 @@ module exe(
 
     // OutPut Data
     output wire [31:0]  o_alu_result,
+    output wire [31:0]  o_pc_immed,
 
     // PC Ouput
     output wire [31:0]  o_jump_addr,
@@ -52,12 +53,11 @@ module exe(
     );
 
     // Connect PC/Immediate Adder
-    wire [31:0] pc_immed;
     add_pg_32 pcAdder(
         .val1(i_instr_addr),
         .val2(i_immed),
         .carry_in(1'b0),
-        .val_out(pc_immed),
+        .val_out(o_pc_immed),
         .carry_out(),
         .prop_out(),
         .gen_out()

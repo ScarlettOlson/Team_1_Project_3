@@ -4,7 +4,7 @@ module shifter (
     input wire [31:0] val,
     input wire [4:0] shamt,
     input wire shift_right,   // If this is set then a right shift occurs, otherwise a left shift occurs
-    input wire shift_arith,   // If this is set then an arithmmetic shift occurs, otherwise a right shift occurs
+    input wire shift_arith,   // If this is set then an arithmmetic shift occurs, otherwise a logical shift occurs
 
     output wire [31:0] shifted_val
 );
