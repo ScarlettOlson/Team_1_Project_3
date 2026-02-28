@@ -32,7 +32,7 @@ module exe(
 );
     // Select Alu Input
     wire [31:0] alu_input_1 =   i_reg_rs1_data;
-    wire [31:0] alu_input_2 =   i_alu_op_sel ? i_immed : i_reg_rs2_data;
+    wire [31:0] alu_input_2 =   i_alu_input_sel ? i_immed : i_reg_rs2_data;
 
     // Connect ALU
     wire equal;
