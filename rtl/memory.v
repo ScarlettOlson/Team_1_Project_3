@@ -9,7 +9,7 @@ module mem(
     output wire [31:0]  o_dmem_ren,
     output wire [31:0]  o_dmem_wen,
     output wire [31:0]  o_dmem_wdata,
-    output wire [3:0]  o_dmem_mask,
+    output wire [3:0]   o_dmem_mask,
     input wire [31:0]   i_dmem_rdata,
 
     // Control Signals
