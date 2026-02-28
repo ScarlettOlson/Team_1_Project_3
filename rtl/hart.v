@@ -155,6 +155,9 @@ module hart #(
     // Instruction Decode Phase
     wire [31:0] reg_wr_data;        // This Value is selected later, in the Write Back Phase
 
+    wire [4:0]  reg_rd_addr;
+    wire [4:0]  reg_rs1_addr;
+    wire [4:0]  reg_rs2_addr;
     wire [31:0] reg_rs1_data;
     wire [31:0] reg_rs2_data;
     wire [31:0] immed;
@@ -177,6 +180,7 @@ module hart #(
     wire [2:0]  funct3;
     wire [6:0]  funct7;
 
+    wire [6:0]  instr_format;
     instrDecode instructionDecode(
         .i_clk(i_clk),
         .i_rst(i_rst),
@@ -184,6 +188,9 @@ module hart #(
         .i_instr(instr),
         .i_reg_wr_data(reg_wr_data),
 
+        .o_reg_addr_wr(reg_rd_addr),
+        .o_reg_addr_1(reg_rs1_addr),
+        .o_reg_addr_2(reg_rs2_addr),
         .o_reg_data_1(reg_rs1_data),
         .o_reg_data_2(reg_rs2_data),
         .o_immed(immed),
@@ -204,7 +211,9 @@ module hart #(
         .o_halt(halt_signal),
 
         .o_funct3(funct3),
-        .o_funct7(funct7)
+        .o_funct7(funct7),
+
+        .o_format(instr_format)
     );
     
     // Execution Phase
@@ -256,14 +265,10 @@ module hart #(
         .i_dmem_wr_en(dmem_wr_en),
         .i_funct3(funct3),
 
-        .o_dmem_wdata(o_dmem_wdata),
-        .o_dmem_mask(o_dmem_mask),
-        .i_dmem_rdata(i_dmem_rdata),
-
         .i_alu_result(alu_result),
         .i_reg_rs2_data(reg_rs2_data),
 
-        .o_dmem_data(shifted_mem_data)
+        .o_dmem_shifted_data(shifted_mem_data)
     );
 
     // Write Back Phase
@@ -285,6 +290,7 @@ module hart #(
     // Set all Retire signals at the end of the cycle.
     assign o_retire_valid = 1'b1;
     assign o_retire_inst = instr;
+<<<<<<< HEAD
     assign o_retire_trap = ;
     assign o_retire_halt = halt_signal;
     assign o_retire_rs1_raddr = ;
@@ -295,6 +301,18 @@ module hart #(
     assign o_retire_rd_wdata = reg_wr_data;
     assign o_retire_pc = o_imem_raddr;
     assign o_retire_next_pc = next_instr_addr;
+=======
+    //assign o_retire_trap = ;
+    //assign o_retire_halt = ;
+    assign o_retire_rs1_raddr = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_addr : 5'b00000;
+    assign o_retire_rs2_raddr = (instr_format[0] | instr_format[2] | instr_format[3]) ? reg_rs2_addr : 5'b00000;
+    assign o_retire_rs1_rdata = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_data : 32'h00000000;
+    assign o_retire_rs2_rdata = (instr_format[0] | instr_format[2] | instr_format[3]) ? reg_rs2_data : 32'h00000000;
+    assign o_retire_rd_waddr = (instr_format[0] | instr_format[1] | instr_format[4] | instr_format[5]) ? reg_rd_addr : 5'b00000;
+    assign o_retire_rd_wdata = (instr_format[0] | instr_format[1] | instr_format[4] | instr_format[5]) ? reg_wr_data : 32'h00000000;
+    //assign o_retire_pc = ;
+    //assign o_retire_next_pc = ;
+>>>>>>> 2d34b716810ff6eef2989b3b3980ff31cfc3d2a2
 
 
 endmodule

@@ -71,7 +71,7 @@ module exe(
         .i_eq(equal),
         .i_slt(less_than),
 
-        .o_jump_cntr(o_jump_sel)
+        .o_jump_cntr(o_branch_sel)
     );
 
     // Connect PC Jump Address

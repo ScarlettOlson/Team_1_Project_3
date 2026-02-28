@@ -6,10 +6,10 @@ module mem(
 
     // Memory Connection Pass Through
     output wire [31:0]  o_dmem_addr,
-    output wire [31:0]  o_dmem_ren,
-    output wire [31:0]  o_dmem_wen,
+    output wire         o_dmem_ren,
+    output wire         o_dmem_wen,
     output wire [31:0]  o_dmem_wdata,
-    output wire [3:0]  o_dmem_mask,
+    output wire [3:0]   o_dmem_mask,
     input wire [31:0]   i_dmem_rdata,
 
     // Control Signals
@@ -37,7 +37,7 @@ module mem(
         .shamt(shift_amt),
         .shift_right(1'b1),
         .shift_arith(1'b0),
-        .shifted_val(dmem_input_data)
+        .shifted_val(dmem_input_addr)
     );
 
     // Connect Mask Generator
@@ -55,6 +55,7 @@ module mem(
     assign o_dmem_wen =     i_dmem_wr_en;
     assign o_dmem_wdata =   i_alu_result;
     assign o_dmem_mask =    mask;
+    wire [31:0] dmem_data_out;
     assign dmem_data_out =  i_dmem_rdata;
 
 
