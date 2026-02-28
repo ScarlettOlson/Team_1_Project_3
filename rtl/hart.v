@@ -1,3 +1,5 @@
+`default_nettype none
+
 module hart #(
     // After reset, the program counter (PC) should be initialized to this
     // address and start executing instructions from there.
@@ -130,56 +132,143 @@ module hart #(
     ,`RVFI_OUTPUTS,
 `endif
 );
+    wire [31:0] next_instr_addr;// The Address of the subsequent instruction
+    wire [31:0] jump_instr_addr;// The Instruction to jump to if branch is taken 
+    wire        jump_sel;       // Both Jump pieces are determined during the exe phase
+    // Instruction Fetch Phase
+    instrFetch instructionFetch(
+        .i_clk(i_clk),
+        .i_rst(i_rst),
 
-    wire i_jump_mux;
-    wire i_branch_mux;
-    wire i_alu_mux_1, i_alu_mux_2;
-    wire [2:0] i_reg_write_mux;
-    wire i_branch_type_mux;
-    wire i_reg_write_enable;
-    wire i_dmem_write_en;
-    wire i_dmem_read_en;
-    wire [5:0] i_format;
+        .o_imem_raddr(o_imem_raddr),
+        .i_imem_rdata(i_imem_rdata),
 
-    // Fill in your implementation here.
-    control_unit i_cntr(.opcode(i_imem_rdata[6:0]), 
-                        .funct3(i_imem_rdata[14:12]), 
-                        .funct7(i_imem_rdata[31:25]), 
-                        .jump_mux(i_jump_mux), 
-                        .branch_mux(i_branch_mux), 
-                        .alu_mux_1(i_alu_mux_1),
-                        .alu_mux_2(i_alu_mux_2),
-                        .reg_write_mux(i_reg_write_mux), 
-                        .branch_type_mux(i_branch_type_mux),
-                        .reg_write_enable(i_reg_write_enable),
-                        .dmem_write_enable(i_dmem_write_en),
-                        .dmem_read_enable(i_dmem_read_en),
-                        .i_format(i_format));
+        .i_next_instr_addr(next_instr_addr),
+        .i_jump_instr_addr(jump_instr_addr),
+        .i_jump_sel(jump_sel),
 
-    datapath i_datapath(.clk(i_clk), .rst(i_rst), 
-                        .imem_addr(o_imem_raddr), 
-                        .imem_rdata(i_imem_rdata), 
-                        .dmem_addr(o_dmem_addr), 
-                        .dmen_wdata(o_dmem_wdata),
-                        .dmem_rdata(i_dmem_rdata),
-                        .imem_rdata(i_imem_rdata),
-                        .imem_addr(o_imem_raddr),
-                        .reg_wen(i_reg_write_enable),
-                        .alu_src(i_alu_mux_2),
-                        .mem_ren(i_dmem_read_en),
-                        .mem_wen(i_dmem_read_en),
-                        .pc_sel(i_branch_mux),
-                        );
+        .o_instr(o_retire_inst),
+        .o_incr_instr_addr(next_instr_addr)
+    );
+    
+    // Instruction Decode Phase
+    wire [31:0] reg_wr_data;        // This Value is selected later, in the Write Back Phase
+    wire [31:0] reg_rs1_data;
+    wire [31:0] reg_rs2_data;
+    wire [31:0] immed;
+    wire        alu_input_sel;
+    wire [2:0]  alu_op_sel;
+    wire        alu_sub_sel;
+    wire        alu_sign_sel;
+    wire        alu_arith_sel;
+    wire        jump_type_sel;
+    wire [3:0]  dmem_mask;
+    wire        dmem_wr_en;
+    wire        dmem_rd_en;
+    wire        dmem_zero_ext;
+    wire [2:0]  reg_wr_sel;
+    wire [2:0]  funct3;
+    wire [6:0]  funct7;
 
-    always (@posedge clk, rst) begin
+    instrDecode instructionDecode(
+        .i_clk(i_clk),
+        .i_rst(i_rst),
 
-        if (rst) begin
-            o_imem_raddr = RESET_ADDR;
-        end
+        .i_instr(o_retire_inst),
+        .i_reg_wr_data(reg_wr_data),
+
+        .o_reg_data_1(reg_rs1_data),
+        .o_reg_data_2(reg_rs2_data),
+        .o_immed(immed),
+
+        .o_alu_input_sel(alu_input_sel),
+        .o_alu_op_sel(alu_op_sel),
+        .o_alu_sub_sel(alu_sub_sel),
+        .o_alu_sign_sel(alu_sign_sel),
+        .o_alu_arith_sel(alu_arith_sel),
+
+        .o_jump_type_sel(jump_type_sel),
+        .o_jump_sel(jump_sel),
+
+        .o_dmem_wr_en(o_dmem_wen),
+        .o_dmem_rd_en(o_dmem_ren),
+        .o_dmem_zero_ext(dmem_zero_ext),
+
+        .o_reg_wr_sel(reg_wr_sel),
+        .o_halt(o_retire_halt),
+
+        .o_funct3(funct3),
+        .o_funct7(funct7)
+    );
+    
+    // Execution Phase
+    wire [31:0] alu_result;
+    wire [31:0] pc_immed;
+    exe execution(
+        .i_clk(i_clk),
+        .i_rst(i_rst),
+
+        .i_alu_input_sel(alu_input_sel),
+        .i_alu_op_sel(alu_op_sel),
+        .i_alu_sub_sel(alu_sub_sel),
+        .i_alu_sign_sel(alu_sign_sel),
+        .i_alu_arith_sel(alu_arith_sel),
+        
+        .i_jump_type_sel(jump_type_sel),
+        .i_jump_sel(jump_sel),
+        .i_funct3(funct3),
+
+        .i_reg_rs1_data(reg_rs1_data),
+        .i_reg_rs2_data(reg_rs2_data),
+        .i_immed(immed),
+        .i_instr(o_retire_inst),
+
+        .o_alu_result(alu_result),
+        .o_jump_addr(jump_instr_addr),
+        .o_pc_immed(pc_immed),
+        .o_jump_sel(jump_sel)
+    );
 
 
 
-    end
+    // Memory Phase
+    wire [31:0]  shifted_mem_data;
+    mem memory(
+        .i_clk(i_clk),
+        .i_rst(i_rst),
+
+        .i_dmem_rd_en(dmem_rd_en),
+        .i_dmem_wr_en(dmem_wr_en),
+        .i_funct3(funct3),
+        .i_zero_extend(dmem_zero_ext),
+
+        .o_dmem_wdata(o_dmem_wdata),
+        .o_dmem_mask(o_dmem_mask),
+        .i_dmem_rdata(i_dmem_rdata),
+
+        .i_alu_result(alu_result),
+        .i_reg_rs2_data(reg_rs2_data),
+
+        .o_dmem_data(shifted_mem_data)
+    );
+
+    // Write Back Phase
+    wrBack writeBack(
+        .i_clk(i_clk),
+        .i_rst(i_rst),
+
+        .i_reg_wr_sel(reg_wr_sel),
+
+        .i_alu_result(alu_result),
+        .i_shifted_mem_data(shifted_mem_data),
+        .i_pc_immed(pc_immed),
+        .i_immed(immed),
+        .i_next_pc_addr(next_instr_addr),
+
+        .o_wr_back_data(reg_wr_data)
+    );
+
+
 endmodule
 
 `default_nettype wire

@@ -19,10 +19,10 @@ module add_pg_4 (
     assign prop = val1 ^ val2;
 
 
-    assign carry[0] = gen[0] | carry_in & prop[0];
-    assign carry[1] = gen[1] | carry[0] & prop[1];
-    assign carry[2] = gen[2] | carry[1] & prop[2];
-    assign carry[3] = gen[3] | carry[2] & prop[3];
+    assign carry[0] = gen[0] | (carry_in & prop[0]);
+    assign carry[1] = gen[1] | (carry[0] & prop[1]);
+    assign carry[2] = gen[2] | (carry[1] & prop[2]);
+    assign carry[3] = gen[3] | (carry[2] & prop[3]);
 
     
     assign val_out[0] = val1[0] ^ val2[0] ^ carry_in;
@@ -33,9 +33,9 @@ module add_pg_4 (
 
     assign prop_out = &prop;
     assign gen_out = gen[3] | 
-                    prop[3] & gen[2] | 
-                    prop[3] & prop[2] & gen[1] | 
-                    prop[3] & prop[2] & prop[1] & gen[0];
+                    (prop[3] & gen[2]) | 
+                    (prop[3] & prop[2] & gen[1]) | 
+                    (prop[3] & prop[2] & prop[1] & gen[0]);
 
 endmodule
 

@@ -26,7 +26,7 @@ module add_pg_32 (
         .prop_out(prop[0]),
         .gen_out(gen[0])
     );
-    assign carry[0] = gen[0] | carry_in & prop[0];
+    assign carry[0] = gen[0] | (carry_in & prop[0]);
 
 
     add_pg_16 adder1 (
@@ -40,11 +40,11 @@ module add_pg_32 (
         .prop_out(prop[1]),
         .gen_out(gen[1])
     );
-    assign carry[1] = gen[1] | carry[0] & prop[1];
+    assign carry[1] = gen[1] | (carry[0] & prop[1]);
 
     assign carry_out = carry[1];
     assign prop_out = &prop;
-    assign gen_out = gen[1] | prop[1] & gen[0];
+    assign gen_out = gen[1] | (prop[1] & gen[0]);
 endmodule
 
 `default_nettype wire

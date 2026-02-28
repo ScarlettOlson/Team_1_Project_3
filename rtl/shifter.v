@@ -1,12 +1,12 @@
 `default_nettype none
 
 module shifter (
-    input [31:0] val,
-    input [4:0] shamt,
-    input shift_right,   // If this is set then a right shift occurs, otherwise a left shift occurs
-    input shift_arith,   // If this is set then an arithmmetic shift occurs, otherwise a right shift occurs
+    input wire [31:0] val,
+    input wire [4:0] shamt,
+    input wire shift_right,   // If this is set then a right shift occurs, otherwise a left shift occurs
+    input wire shift_arith,   // If this is set then an arithmmetic shift occurs, otherwise a logical shift occurs
 
-    output [31:0] shifted_val
+    output wire [31:0] shifted_val
 );
     // Shift Left, arithmetic and logical are the same
     wire [31:0] shift_l1;
