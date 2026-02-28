@@ -25,6 +25,7 @@ module instrDecode(
     // Data Memory Control
     output wire         o_dmem_wr_en,
     output wire         o_dmem_rd_en,
+    output wire         o_dmem_zero_ext,
     // Write Back Control
     output wire [2:0]   o_reg_wr_sel,
     // HALT CONTROL SIGNAL
@@ -36,9 +37,12 @@ module instrDecode(
 );
 
     // Assign operation and function codes
-    assign opcode =             i_instr[6:0]
-    assign o_funct3 =           i_instr[14:12];
-    assign o_funct7 =           i_instr[31:25];
+    wire [6:0] opcode;
+    wire [2:0] funct3;
+    wire [6:0] funct7;
+    assign opcode =         i_instr[6:0];
+    assign o_funct3 =       i_instr[14:12];
+    assign o_funct7 =       i_instr[31:25];
 
     // Connect control Unit
     wire [5:0] instr_format;
@@ -63,7 +67,8 @@ module instrDecode(
     
         .o_dmem_wr_en(o_dmem_wr_en),
         .o_dmem_rd_en(o_dmem_rd_en),
-    
+        .o_dmem_zero_ext(o_dmem_zero_ext),
+        
         .o_reg_wr_sel(o_reg_wr_sel),
         .o_reg_wr_en(reg_wr_en),
 
@@ -71,9 +76,12 @@ module instrDecode(
     );
 
     // Connect Register File
-    assign rs1_addr =           i_isntr[19:15];
-    assign rs2_addr =           i_instr[24:20];
-    assign rd_addr =            i_instr[11:7];
+    wire [4:0] rs1_addr;
+    wire [4:0] rs2_addr;
+    wire [4:0] rd_addr;
+    assign rs1_addr =       i_instr[19:15];
+    assign rs2_addr =       i_instr[24:20];
+    assign rd_addr =        i_instr[11:7];
     rf registerFile(
         .i_clk(i_clk),
         .i_rst(i_rst),

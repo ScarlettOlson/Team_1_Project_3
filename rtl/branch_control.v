@@ -10,14 +10,14 @@ module b_cntr(
     output wire         o_jump_cntr
 );
     wire branchTaken;
-    assign branchTaken =    (funct3 == 3'b000) ? i_eq :
-                            (funct3 == 3'b001) ? !i_eq :
-                            (funct3 == 3'b100) ? i_slt :
-                            (funct3 == 3'b101) ? !i_slt | i_eq :
-                            (funct3 == 3'b110) ? i_slt :
-                            (funct3 == 3'b111) ? !i_slt : 1'b0;
+    assign branchTaken =    (i_funct3 == 3'b000) ? i_eq :
+                            (i_funct3 == 3'b001) ? !i_eq :
+                            (i_funct3 == 3'b100) ? i_slt :
+                            (i_funct3 == 3'b101) ? !i_slt | i_eq :
+                            (i_funct3 == 3'b110) ? i_slt :
+                            (i_funct3 == 3'b111) ? !i_slt : 1'b0;
 
-    assign jump_cntr = jump ? 1'b1 : branchTaken;
+    assign o_jump_cntr = i_jump ? 1'b1 : branchTaken;
 
 endmodule
 

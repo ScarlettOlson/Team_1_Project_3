@@ -132,7 +132,6 @@ module hart #(
     ,`RVFI_OUTPUTS,
 `endif
 );
-    wire [31:0] exe_instr;      // The Instruction to execute this cycle
     wire [31:0] next_instr_addr;// The Address of the subsequent instruction
     wire [31:0] jump_instr_addr;// The Instruction to jump to if branch is taken 
     wire        jump_sel;       // Both Jump pieces are determined during the exe phase
@@ -141,15 +140,15 @@ module hart #(
         .i_clk(i_clk),
         .i_rst(i_rst),
 
-        .o_imem_addr(o_imem_addr),
+        .o_imem_raddr(o_imem_raddr),
         .i_imem_rdata(i_imem_rdata),
 
         .i_next_instr_addr(next_instr_addr),
         .i_jump_instr_addr(jump_instr_addr),
-        .i_jump_sel(jump_sel)
+        .i_jump_sel(jump_sel),
 
-        .instr(exe_instr),
-        .incr_instr_addr(incr_instr_addr)
+        .o_instr(o_retire_inst),
+        .o_incr_instr_addr(next_instr_addr)
     );
     
     // Instruction Decode Phase
@@ -163,10 +162,10 @@ module hart #(
     wire        alu_sign_sel;
     wire        alu_arith_sel;
     wire        jump_type_sel;
-    wire        jump_sel;
     wire [3:0]  dmem_mask;
     wire        dmem_wr_en;
     wire        dmem_rd_en;
+    wire        dmem_zero_ext;
     wire [2:0]  reg_wr_sel;
     wire [2:0]  funct3;
     wire [6:0]  funct7;
@@ -175,7 +174,7 @@ module hart #(
         .i_clk(i_clk),
         .i_rst(i_rst),
 
-        .i_instr(exe_instr),
+        .i_instr(o_retire_inst),
         .i_reg_wr_data(reg_wr_data),
 
         .o_reg_data_1(reg_rs1_data),
@@ -191,11 +190,12 @@ module hart #(
         .o_jump_type_sel(jump_type_sel),
         .o_jump_sel(jump_sel),
 
-        .o_dmem_wr_en(.o_dmem_wen),
-        .o_dmem_rd_en(.o_dmem_ren),
+        .o_dmem_wr_en(o_dmem_wen),
+        .o_dmem_rd_en(o_dmem_ren),
+        .o_dmem_zero_ext(dmem_zero_ext),
 
         .o_reg_wr_sel(reg_wr_sel),
-        .o_halt(.o_retire_halt),
+        .o_halt(o_retire_halt),
 
         .o_funct3(funct3),
         .o_funct7(funct7)
@@ -203,7 +203,6 @@ module hart #(
     
     // Execution Phase
     wire [31:0] alu_result;
-    wire [31:0] jump_instr_addr;
     wire [31:0] pc_immed;
     exe execution(
         .i_clk(i_clk),
@@ -225,7 +224,7 @@ module hart #(
         .i_instr(o_retire_inst),
 
         .o_alu_result(alu_result),
-        .o_jump_addr(jump_inst_addr),
+        .o_jump_addr(jump_instr_addr),
         .o_pc_immed(pc_immed),
         .o_jump_sel(jump_sel)
     );
@@ -233,7 +232,7 @@ module hart #(
 
 
     // Memory Phase
-    wire [31:0]  shifter_mem_data;
+    wire [31:0]  shifted_mem_data;
     mem memory(
         .i_clk(i_clk),
         .i_rst(i_rst),
@@ -241,16 +240,16 @@ module hart #(
         .i_dmem_rd_en(dmem_rd_en),
         .i_dmem_wr_en(dmem_wr_en),
         .i_funct3(funct3),
-        .i_zero_extend(mem_zero_extend),
+        .i_zero_extend(dmem_zero_ext),
 
-        .o_dmem_wdata(.o_dmem_wdata),
-        .o_dmem_mask(.o_dmem_mask),
-        .i_dmem_rdata(.i_dmem_rdata),
+        .o_dmem_wdata(o_dmem_wdata),
+        .o_dmem_mask(o_dmem_mask),
+        .i_dmem_rdata(i_dmem_rdata),
 
         .i_alu_result(alu_result),
         .i_reg_rs2_data(reg_rs2_data),
 
-        .o_dmem_data(shifted_mem_data),
+        .o_dmem_data(shifted_mem_data)
     );
 
     // Write Back Phase
@@ -261,7 +260,7 @@ module hart #(
         .i_reg_wr_sel(reg_wr_sel),
 
         .i_alu_result(alu_result),
-        .i_shifter_mem_data(shifted_mem_data),
+        .i_shifted_mem_data(shifted_mem_data),
         .i_pc_immed(pc_immed),
         .i_immed(immed),
         .i_next_pc_addr(next_instr_addr),

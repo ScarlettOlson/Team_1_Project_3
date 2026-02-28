@@ -24,48 +24,50 @@ module cntrUnit(
     // Data Memory Control
     output wire         o_dmem_wr_en,
     output wire         o_dmem_rd_en,
+    output wire         o_dmem_zero_ext,
     // Write Back Control
-    output wire [2:0]   o_reg_wr_sel
+    output wire [2:0]   o_reg_wr_sel,
     output wire         o_reg_wr_en,
 
     // HALT SIGNAL STOPS EXE
-    output wire         o_halt,
+    output wire         o_halt
 
 );
     // Gernerate Instruction Format
-    assign o_format[0] =        !opcode[2] & !opcode[3] & opcode[4] & opcode[5] & opcode[6];
-    assign o_format[1] =        !opcode[2] & opcode[4] & !opcode[5];
-    assign o_format[2] =        !opcode[2] & !opcode[3] & !opcode[4] & opcode[5];
-    assign o_format[3] =        !opcode[2] & !opcode[3] & !opcode[4] & opcode[5] & opcode[6];
-    assign o_format[4] =        opcode[2] & opcode[4];
-    assign o_format[5] =        opcode[3] &  opcode[6];
+    assign o_format[0] =        !i_opcode[2] & !i_opcode[3] & i_opcode[4] & i_opcode[5] & i_opcode[6];
+    assign o_format[1] =        !i_opcode[2] & i_opcode[4] & !i_opcode[5];
+    assign o_format[2] =        !i_opcode[2] & !i_opcode[3] & !i_opcode[4] & i_opcode[5];
+    assign o_format[3] =        !i_opcode[2] & !i_opcode[3] & !i_opcode[4] & i_opcode[5] & i_opcode[6];
+    assign o_format[4] =        i_opcode[2] & i_opcode[4];
+    assign o_format[5] =        i_opcode[3] &  i_opcode[6];
 
     // ALU Control Signals
-    assign o_alu_input_sel =    (!opcode[2] & opcode[4] & !opcode[5]) | (opcode[2] & !opcode[3] & opcode[6]) | (!opcode[6] & opcode[5] & !opcode[4]);
-    assign o_alu_op_sel[0] =    (funct3[0] | (funct3[1] & !funct3[2])) & opcode[4] & !opcode[2];
-    assign o_alu_op_sel[1] =    funct3[1] & opcode[4] & opcode[5] & !opcode[2];
-    assign o_alu_op_sel[2] =    funct3[2] & opcode[4] & opcode[5] & !opcode[2];
-    assign o_alu_sub_sel =      opcode[4] & opcode[5] & funct7[5];
-    assign o_alu_sign_sel =     opcode[4] & funct3[0];
-    assign o_alu_arith_sel =    opcode[4] & funct7[5];
+    assign o_alu_input_sel =    (!i_opcode[2] & i_opcode[4] & !i_opcode[5]) | (i_opcode[2] & !i_opcode[3] & i_opcode[6]) | (!i_opcode[6] & i_opcode[5] & !i_opcode[4]);
+    assign o_alu_op_sel[0] =    (i_funct3[0] | (i_funct3[1] & !i_funct3[2])) & i_opcode[4] & !i_opcode[2];
+    assign o_alu_op_sel[1] =    i_funct3[1] & i_opcode[4] & i_opcode[5] & !i_opcode[2];
+    assign o_alu_op_sel[2] =    i_funct3[2] & i_opcode[4] & i_opcode[5] & !i_opcode[2];
+    assign o_alu_sub_sel =      i_opcode[4] & i_opcode[5] & i_funct7[5];
+    assign o_alu_sign_sel =     i_opcode[4] & i_funct3[0];
+    assign o_alu_arith_sel =    i_opcode[4] & i_funct7[5];
 
     // PC Select Control
-    assign o_jump_type_sel =    opcode[6] & opcode[5] & !opcode[3] & opcode[2];
-    assign o_jump_sel =         opcode[6] & opcode[5] & opcode[2];
+    assign o_jump_type_sel =    i_opcode[6] & i_opcode[5] & !i_opcode[3] & i_opcode[2];
+    assign o_jump_sel =         i_opcode[6] & i_opcode[5] & i_opcode[2];
 
     // Data Memory Control
     assign o_dmem_wr_en =       o_format[2];
-    assign o_dmem_rd_en =       !opcode[4] & !opcode[5];
+    assign o_dmem_rd_en =       !i_opcode[4] & !i_opcode[5];
+    assign o_dmem_zero_ext =    i_funct3[2];
 
     // Write Back Control
-    assign o_reg_wr_sel[0] =    opcode[5] & !opcode[6];
-    assign o_reg_wr_sel[1] =    opcode[3] & !opcode[6];
-    assign o_reg_wr_sel[2] =    opcode[6];
+    assign o_reg_wr_sel[0] =    i_opcode[5] & !i_opcode[6];
+    assign o_reg_wr_sel[1] =    i_opcode[3] & !i_opcode[6];
+    assign o_reg_wr_sel[2] =    i_opcode[6];
     assign o_reg_wr_en =        o_format[1] | o_format[4] | o_format[5];
 
 
     // Determine if the instruction is a halt 
-    assign o_halt = opcode[6] & opcode[5] & opcode[4];
+    assign o_halt = i_opcode[6] & i_opcode[5] & i_opcode[4];
    
 
 endmodule
