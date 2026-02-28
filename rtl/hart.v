@@ -286,15 +286,15 @@ module hart #(
     assign o_retire_valid = 1'b1;
     assign o_retire_inst = instr;
     assign o_retire_trap = ;
-    assign o_retire_halt = ;
+    assign o_retire_halt = halt_signal;
     assign o_retire_rs1_raddr = ;
-    assign o_retire_rs1_raddr = ;
+    assign o_retire_rs2_raddr = ;
     assign o_retire_rs1_rdata = ;
     assign o_retire_rs2_rdata = ;
     assign o_retire_rd_waddr = ;
-    assign o_retire_rd_wdata = ;
-    assign o_retire_pc = ;
-    assign o_retire_next_pc = ;
+    assign o_retire_rd_wdata = reg_wr_data;
+    assign o_retire_pc = o_imem_raddr;
+    assign o_retire_next_pc = next_instr_addr;
 
 
 endmodule
