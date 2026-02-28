@@ -8,8 +8,9 @@ module instrDecode(
     input wire [31:0]   i_reg_wr_data,
     
     // Data Signals
-    output wire [6:0]   o_reg_addr_1,
-    output wire [6:0]   o_reg_addr_2
+    output wire [4:0]   o_reg_addr_wr,
+    output wire [4:0]   o_reg_addr_1,
+    output wire [4:0]   o_reg_addr_2
     output wire [31:0]  o_reg_data_1,
     output wire [31:0]  o_reg_data_2,
     output wire [31:0]  o_immed,
@@ -89,6 +90,7 @@ module instrDecode(
     assign rd_addr =        i_instr[11:7];
     assign o_reg_addr_1 =   rs1_addr;
     assign o_reg_addr_2 =   rs2_addr;
+    assign o_reg_addr_wr =  rd_addr;
     rf registerFile(
         .i_clk(i_clk),
         .i_rst(i_rst),

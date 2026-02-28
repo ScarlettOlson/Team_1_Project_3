@@ -155,6 +155,7 @@ module hart #(
     // Instruction Decode Phase
     wire [31:0] reg_wr_data;        // This Value is selected later, in the Write Back Phase
 
+    wire [4:0]  reg_rd_addr;
     wire [4:0]  reg_rs1_addr,
     wire [4:0]  reg_rs2_addr,
     wire [31:0] reg_rs1_data;
@@ -187,6 +188,7 @@ module hart #(
         .i_instr(instr),
         .i_reg_wr_data(reg_wr_data),
 
+        .o_reg_addr_wr(reg_rd_addr),
         .o_reg_addr_1(reg_rs1_addr),
         .o_reg_addr_2(reg_rs2_addr),
         .o_reg_data_1(reg_rs1_data),
@@ -298,8 +300,8 @@ module hart #(
     assign o_retire_rs2_raddr = (instr_format[0] | instr_format[2] | instr_format[3]) ? reg_rs2_addr : 5'b00000;
     assign o_retire_rs1_rdata = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_data : 32'h00000000;
     assign o_retire_rs2_rdata = (instr_format[0] | instr_format[2] | instr_format[3]) ? reg_rs2_data : 32'h00000000;
-    assign o_retire_rd_waddr = ;
-    assign o_retire_rd_wdata = ;
+    assign o_retire_rd_waddr = (instr_format[0] | instr_format[1] | instr_format[4] | instr_format[5]) ? reg_rd_addr : 5'b00000;
+    assign o_retire_rd_wdata = (instr_format[0] | instr_format[1] | instr_format[4] | instr_format[5]) ? reg_wr_data : 32'h00000000;
     assign o_retire_pc = ;
     assign o_retire_next_pc = ;
 
