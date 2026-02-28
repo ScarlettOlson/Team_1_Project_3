@@ -28,7 +28,6 @@ module instrDecode(
     // Data Memory Control
     output wire         o_dmem_wr_en,
     output wire         o_dmem_rd_en,
-    output wire         o_dmem_zero_ext,
     // Write Back Control
     output wire [2:0]   o_reg_wr_sel,
     // HALT CONTROL SIGNAL
