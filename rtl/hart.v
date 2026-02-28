@@ -156,8 +156,8 @@ module hart #(
     wire [31:0] reg_wr_data;        // This Value is selected later, in the Write Back Phase
 
     wire [4:0]  reg_rd_addr;
-    wire [4:0]  reg_rs1_addr,
-    wire [4:0]  reg_rs2_addr,
+    wire [4:0]  reg_rs1_addr;
+    wire [4:0]  reg_rs2_addr;
     wire [31:0] reg_rs1_data;
     wire [31:0] reg_rs2_data;
     wire [31:0] immed;
