@@ -38,7 +38,7 @@ module instrDecode(
     output wire [6:0]   o_funct7,
 
     // Output Instruction format
-    output wire [6:0]   o_format
+    output wire [5:0]   o_format
 );
 
     // Assign operation and function codes

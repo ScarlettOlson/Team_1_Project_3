@@ -180,7 +180,7 @@ module hart #(
     wire [2:0]  funct3;
     wire [6:0]  funct7;
 
-    wire [6:0]  instr_format;
+    wire [5:0]  instr_format;
     instrDecode instructionDecode(
         .i_clk(i_clk),
         .i_rst(i_rst),
@@ -288,10 +288,10 @@ module hart #(
     );
 
     // Set all Retire signals at the end of the cycle.
-    assign o_retire_valid = 1'b1;
+    assign o_retire_valid = halt_signal ? 1'b0 : 1'b1;
     assign o_retire_inst = instr;
     //assign o_retire_trap = ;
-    //assign o_retire_halt = ;
+    assign o_retire_halt = halt_signal;
     assign o_retire_rs1_raddr = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_addr : 5'b00000;
     assign o_retire_rs2_raddr = (instr_format[0] | instr_format[2] | instr_format[3]) ? reg_rs2_addr : 5'b00000;
     assign o_retire_rs1_rdata = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_data : 32'h00000000;
