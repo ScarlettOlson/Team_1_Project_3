@@ -176,6 +176,7 @@ module hart #(
 
     wire [2:0]  reg_wr_sel;
     wire        halt_signal;
+    wire        trap_signal;
 
     wire [2:0]  funct3;
     wire [6:0]  funct7;
@@ -209,6 +210,7 @@ module hart #(
 
         .o_reg_wr_sel(reg_wr_sel),
         .o_halt(halt_signal),
+        .o_trap(trap_signal),
 
         .o_funct3(funct3),
         .o_funct7(funct7),
@@ -288,9 +290,9 @@ module hart #(
     );
 
     // Set all Retire signals at the end of the cycle.
-    assign o_retire_valid = halt_signal ? 1'b0 : 1'b1;
+    assign o_retire_valid = !halt_signal;
     assign o_retire_inst = instr;
-    assign o_retire_trap = 1'b0;
+    assign o_retire_trap = trap_signal;
     assign o_retire_halt = halt_signal;
     assign o_retire_rd_wdata = reg_wr_data;
     assign o_retire_pc = o_imem_raddr;

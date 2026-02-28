@@ -115,14 +115,14 @@ module alu (
 
     // Set result value
     assign o_result = 
-        (i_opsel == 3'b000) ? add_sub :          // Select Add/Sub
-        (i_opsel == 3'b001) ? shift :            // Select Shift
-        (i_opsel == 3'b010) ? {{31{1'b0}}, slt} :         // Invalid, set output to 0
-        (i_opsel == 3'b011) ? {{31{1'b0}}, slt} :  // Set less then only effects first output bit
-        (i_opsel == 3'b100) ? val_xor :          // Select xor
-        (i_opsel == 3'b101) ? shift :            // Select Shift
-        (i_opsel == 3'b110) ? val_or :           // Select or
-        val_and;         // Select and
+        (i_opsel == 3'b000) ? add_sub :             // Select Add/Sub
+        (i_opsel == 3'b001) ? shift :               // Select Shift
+        (i_opsel == 3'b010) ? {{31{1'b0}}, slt} :   // Set less then
+        (i_opsel == 3'b011) ? {{31{1'b0}}, slt} :   // Set less then unsigned
+        (i_opsel == 3'b100) ? val_xor :             // Select xor
+        (i_opsel == 3'b101) ? shift :               // Select Shift
+        (i_opsel == 3'b110) ? val_or :              // Select or
+        val_and;                                    // Select and
 
 
 endmodule

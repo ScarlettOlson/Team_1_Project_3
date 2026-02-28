@@ -32,6 +32,7 @@ module instrDecode(
     output wire [2:0]   o_reg_wr_sel,
     // HALT CONTROL SIGNAL
     output wire         o_halt,
+    output wire         o_trap,
     
     // Output function signals
     output wire [2:0]   o_funct3,
@@ -76,7 +77,8 @@ module instrDecode(
         .o_reg_wr_sel(o_reg_wr_sel),
         .o_reg_wr_en(reg_wr_en),
 
-        .o_halt(o_halt)
+        .o_halt(o_halt),
+        .o_trap(o.trap)
     );
 
     // Connect Register File

@@ -47,7 +47,6 @@ module cntrUnit(
                       is_immed_arith_instr ?    6'b00_0010 :
                       is_upper_immed_instr ?    6'b01_0000 :
                       is_mem_load_instr ?       6'b00_0010 :
-
                       is_mem_store_instr ?      6'b00_0100 :
                       is_branch_instr ?         6'b00_1000 :
                       is_jump_instr ?           6'b10_0000 :
@@ -57,27 +56,28 @@ module cntrUnit(
 
 
     // ALU Control Signals
-    assign o_alu_input_sel =    (!i_opcode[2] & i_opcode[4] & !i_opcode[5] & i_opcode[0] & i_opcode[1]) | (i_opcode[2] & !i_opcode[3] & i_opcode[6] & i_opcode[0] & i_opcode[1]) | (!i_opcode[6] & i_opcode[5] & !i_opcode[4] & i_opcode[0] & i_opcode[1]);
-    assign o_alu_op_sel[0] =    (i_funct3[0] | (i_funct3[1] & !i_funct3[2])) & i_opcode[4] & !i_opcode[2] & i_opcode[0] & i_opcode[1];
-    assign o_alu_op_sel[1] =    i_funct3[1] & i_opcode[4] & i_opcode[5] & !i_opcode[2] & i_opcode[0] & i_opcode[1];
-    assign o_alu_op_sel[2] =    i_funct3[2] & i_opcode[4] & i_opcode[5] & !i_opcode[2] & i_opcode[0] & i_opcode[1];
-    assign o_alu_sub_sel =      i_opcode[4] & i_opcode[5] & i_funct7[5] & i_opcode[0] & i_opcode[1];
-    assign o_alu_sign_sel =     i_opcode[4] & i_funct3[0] & i_opcode[0] & i_opcode[1];
-    assign o_alu_arith_sel =    i_opcode[4] & i_funct7[5] & i_opcode[0] & i_opcode[1];
+    assign o_alu_input_sel =    is_immed_arith_instr | is_mem_load_instr | is_mem_store_instr | is_jump_link_instr;                 // Set when an immed is used
+    assign o_alu_op_sel[0] =    (is_reg_arith_instr | is_immed_arith_instr) ? (i_funct3[0] | (i_funct3 == 3'b010))  : 1'b0;        
+    assign o_alu_op_sel[1] =    (is_reg_arith_instr | is_immed_arith_instr) ? i_funct3[1]                           : 1'b0;
+    assign o_alu_op_sel[2] =    (is_reg_arith_instr | is_immed_arith_instr) ? i_funct3[2]                           : 1'b0;
+    assign o_alu_sub_sel =      ((is_reg_arith_instr | is_immed_arith_instr) & (funct3 == 3'b000)) ? i_funct7[5]    : 1'b0;
+    assign o_alu_sign_sel =     ((is_reg_arith_instr | is_immed_arith_instr) & (funct3 == 3'b011)) ? 1'b1           : (is_branch_instr) ? i_funct3[1]   : 1'b0;
+    assign o_alu_arith_sel =    ((is_reg_arith_instr | is_immed_arith_instr) & (funct3 == 3'b101)) ? i_funct7[5]    : 1'b0;
 
     // PC Select Control
-    assign o_jump_type_sel =    (i_opcode == 7'b110_0111);
-    assign o_jump_sel =         (i_opcode == 7'b110_0111) | (i_opcode == 7'b110_1111);
+    assign o_jump_type_sel =    is_jump_link_instr;
+    assign o_jump_sel =         is_jump_link_instr | is_jump_instr;
 
     // Data Memory Control
-    assign o_dmem_wr_en =       o_format[2];
-    assign o_dmem_rd_en =       (i_opcode == 7'b000_0011);
+    assign o_dmem_wr_en =       is_mem_store_instr;
+    assign o_dmem_rd_en =       is_mem_load_instr;
 
     // Write Back Control
-    assign o_reg_wr_sel[0] =    
-    assign o_reg_wr_sel[1] =    
-    assign o_reg_wr_sel[2] =    
-    assign o_reg_wr_en =        
+    wire is_auipc_instr = (i_opcode == 7'b001_0111);
+    assign o_reg_wr_sel[0] =    is_auipc_instr | is_mem_load_instr; // Set then selector is 1 or 3
+    assign o_reg_wr_sel[1] =    is_upper_immed_instr;               // Set when the selector is 2 or 3
+    assign o_reg_wr_sel[2] =    is_jump_instr | is_jump_link_instr  // Set when the selector is 4
+    assign o_reg_wr_en =        is_reg_arith_instr | is_immed_arith_instr | is_upper_immed_instr | is_mem_load_instr | is_jump_instr | is_jump_link_instr;
    
 
 endmodule
