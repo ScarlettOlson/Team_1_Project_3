@@ -290,7 +290,7 @@ module hart #(
     // Set all Retire signals at the end of the cycle.
     assign o_retire_valid = halt_signal ? 1'b0 : 1'b1;
     assign o_retire_inst = instr;
-    assign o_retire_trap = 1'b1;
+    assign o_retire_trap = 1'b0;
     assign o_retire_halt = halt_signal;
     assign o_retire_rd_wdata = reg_wr_data;
     assign o_retire_pc = o_imem_raddr;
