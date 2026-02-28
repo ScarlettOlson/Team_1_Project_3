@@ -78,7 +78,7 @@ module instrDecode(
         .o_reg_wr_en(reg_wr_en),
 
         .o_halt(o_halt),
-        .o_trap(o.trap)
+        .o_trap(o_trap)
     );
 
     // Connect Register File
