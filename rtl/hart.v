@@ -265,14 +265,10 @@ module hart #(
         .i_dmem_wr_en(dmem_wr_en),
         .i_funct3(funct3),
 
-        .o_dmem_wdata(o_dmem_wdata),
-        .o_dmem_mask(o_dmem_mask),
-        .i_dmem_rdata(i_dmem_rdata),
-
         .i_alu_result(alu_result),
         .i_reg_rs2_data(reg_rs2_data),
 
-        .o_dmem_data(shifted_mem_data)
+        .o_dmem_shifted_data(shifted_mem_data)
     );
 
     // Write Back Phase
@@ -294,16 +290,16 @@ module hart #(
     // Set all Retire signals at the end of the cycle.
     assign o_retire_valid = 1'b1;
     assign o_retire_inst = instr;
-    assign o_retire_trap = ;
-    assign o_retire_halt = ;
+    //assign o_retire_trap = ;
+    //assign o_retire_halt = ;
     assign o_retire_rs1_raddr = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_addr : 5'b00000;
     assign o_retire_rs2_raddr = (instr_format[0] | instr_format[2] | instr_format[3]) ? reg_rs2_addr : 5'b00000;
     assign o_retire_rs1_rdata = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_data : 32'h00000000;
     assign o_retire_rs2_rdata = (instr_format[0] | instr_format[2] | instr_format[3]) ? reg_rs2_data : 32'h00000000;
     assign o_retire_rd_waddr = (instr_format[0] | instr_format[1] | instr_format[4] | instr_format[5]) ? reg_rd_addr : 5'b00000;
     assign o_retire_rd_wdata = (instr_format[0] | instr_format[1] | instr_format[4] | instr_format[5]) ? reg_wr_data : 32'h00000000;
-    assign o_retire_pc = ;
-    assign o_retire_next_pc = ;
+    //assign o_retire_pc = ;
+    //assign o_retire_next_pc = ;
 
 
 endmodule

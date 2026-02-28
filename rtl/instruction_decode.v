@@ -10,7 +10,7 @@ module instrDecode(
     // Data Signals
     output wire [4:0]   o_reg_addr_wr,
     output wire [4:0]   o_reg_addr_1,
-    output wire [4:0]   o_reg_addr_2
+    output wire [4:0]   o_reg_addr_2,
     output wire [31:0]  o_reg_data_1,
     output wire [31:0]  o_reg_data_2,
     output wire [31:0]  o_immed,
@@ -36,7 +36,7 @@ module instrDecode(
     
     // Output function signals
     output wire [2:0]   o_funct3,
-    output wire [6:0]   o_funct7
+    output wire [6:0]   o_funct7,
 
     // Output Instruction format
     output wire [6:0]   o_format
@@ -73,7 +73,6 @@ module instrDecode(
     
         .o_dmem_wr_en(o_dmem_wr_en),
         .o_dmem_rd_en(o_dmem_rd_en),
-        .o_dmem_zero_ext(o_dmem_zero_ext),
         
         .o_reg_wr_sel(o_reg_wr_sel),
         .o_reg_wr_en(reg_wr_en),
