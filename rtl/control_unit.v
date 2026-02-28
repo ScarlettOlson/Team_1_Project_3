@@ -21,7 +21,7 @@ module cntrUnit(
     // PC Select Control
     output wire         o_jump_type_sel, // Selects between pc+=signextend(immed) and pc = target
     output wire         o_jump_sel,      // Informs branch controller if the instruction is a jump or branch type
-    // Data Memory Control
+    // Data Memory Contro
     output wire         o_dmem_wr_en,
     output wire         o_dmem_rd_en,
     // Write Back Control
@@ -57,13 +57,13 @@ module cntrUnit(
 
 
     // ALU Control Signals
-    assign o_alu_input_sel =    (!i_opcode[2] & i_opcode[4] & !i_opcode[5]) | (i_opcode[2] & !i_opcode[3] & i_opcode[6]) | (!i_opcode[6] & i_opcode[5] & !i_opcode[4]);
-    assign o_alu_op_sel[0] =    (i_funct3[0] | (i_funct3[1] & !i_funct3[2])) & i_opcode[4] & !i_opcode[2];
-    assign o_alu_op_sel[1] =    i_funct3[1] & i_opcode[4] & i_opcode[5] & !i_opcode[2];
-    assign o_alu_op_sel[2] =    i_funct3[2] & i_opcode[4] & i_opcode[5] & !i_opcode[2];
-    assign o_alu_sub_sel =      i_opcode[4] & i_opcode[5] & i_funct7[5];
-    assign o_alu_sign_sel =     i_opcode[4] & i_funct3[0];
-    assign o_alu_arith_sel =    i_opcode[4] & i_funct7[5];
+    assign o_alu_input_sel =    (!i_opcode[2] & i_opcode[4] & !i_opcode[5] & i_opcode[0] & i_opcode[1]) | (i_opcode[2] & !i_opcode[3] & i_opcode[6] & i_opcode[0] & i_opcode[1]) | (!i_opcode[6] & i_opcode[5] & !i_opcode[4] & i_opcode[0] & i_opcode[1]);
+    assign o_alu_op_sel[0] =    (i_funct3[0] | (i_funct3[1] & !i_funct3[2])) & i_opcode[4] & !i_opcode[2] & i_opcode[0] & i_opcode[1];
+    assign o_alu_op_sel[1] =    i_funct3[1] & i_opcode[4] & i_opcode[5] & !i_opcode[2] & i_opcode[0] & i_opcode[1];
+    assign o_alu_op_sel[2] =    i_funct3[2] & i_opcode[4] & i_opcode[5] & !i_opcode[2] & i_opcode[0] & i_opcode[1];
+    assign o_alu_sub_sel =      i_opcode[4] & i_opcode[5] & i_funct7[5] & i_opcode[0] & i_opcode[1];
+    assign o_alu_sign_sel =     i_opcode[4] & i_funct3[0] & i_opcode[0] & i_opcode[1];
+    assign o_alu_arith_sel =    i_opcode[4] & i_funct7[5] & i_opcode[0] & i_opcode[1];
 
     // PC Select Control
     assign o_jump_type_sel =    (i_opcode == 7'b110_0111);
