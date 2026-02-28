@@ -28,7 +28,7 @@ module exe(
 
     // PC Ouput
     output wire [31:0]  o_jump_addr,
-    output wire         o_jump_sel
+    output wire         o_branch_sel
 );
     // Select Alu Input
     wire [31:0] alu_input_1 =   i_reg_rs1_data;

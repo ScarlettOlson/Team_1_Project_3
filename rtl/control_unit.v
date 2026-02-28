@@ -24,7 +24,6 @@ module cntrUnit(
     // Data Memory Control
     output wire         o_dmem_wr_en,
     output wire         o_dmem_rd_en,
-    output wire         o_dmem_zero_ext,
     // Write Back Control
     output wire [2:0]   o_reg_wr_sel,
     output wire         o_reg_wr_en,
@@ -57,7 +56,6 @@ module cntrUnit(
     // Data Memory Control
     assign o_dmem_wr_en =       o_format[2];
     assign o_dmem_rd_en =       !i_opcode[4] & !i_opcode[5];
-    assign o_dmem_zero_ext =    i_funct3[2];
 
     // Write Back Control
     assign o_reg_wr_sel[0] =    i_opcode[5] & !i_opcode[6];

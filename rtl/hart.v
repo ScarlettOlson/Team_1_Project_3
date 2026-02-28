@@ -136,6 +136,7 @@ module hart #(
     wire [31:0] jump_instr_addr;// The Instruction to jump to if branch is taken 
     wire        jump_sel;       // Both Jump pieces are determined during the exe phase
     // Instruction Fetch Phase
+    wire [31:0] instr;
     instrFetch instructionFetch(
         .i_clk(i_clk),
         .i_rst(i_rst),
@@ -147,26 +148,32 @@ module hart #(
         .i_jump_instr_addr(jump_instr_addr),
         .i_jump_sel(jump_sel),
 
-        .o_instr(o_retire_inst),
+        .o_instr(instr),
         .o_incr_instr_addr(next_instr_addr)
     );
     
     // Instruction Decode Phase
     wire [31:0] reg_wr_data;        // This Value is selected later, in the Write Back Phase
+
     wire [31:0] reg_rs1_data;
     wire [31:0] reg_rs2_data;
     wire [31:0] immed;
+
     wire        alu_input_sel;
     wire [2:0]  alu_op_sel;
     wire        alu_sub_sel;
     wire        alu_sign_sel;
     wire        alu_arith_sel;
+
     wire        jump_type_sel;
-    wire [3:0]  dmem_mask;
+    //wire      jump_sel    Declared earlier
+    
     wire        dmem_wr_en;
     wire        dmem_rd_en;
-    wire        dmem_zero_ext;
+
     wire [2:0]  reg_wr_sel;
+    wire        halt_signal;
+
     wire [2:0]  funct3;
     wire [6:0]  funct7;
 
@@ -174,7 +181,7 @@ module hart #(
         .i_clk(i_clk),
         .i_rst(i_rst),
 
-        .i_instr(o_retire_inst),
+        .i_instr(instr),
         .i_reg_wr_data(reg_wr_data),
 
         .o_reg_data_1(reg_rs1_data),
@@ -190,20 +197,20 @@ module hart #(
         .o_jump_type_sel(jump_type_sel),
         .o_jump_sel(jump_sel),
 
-        .o_dmem_wr_en(o_dmem_wen),
-        .o_dmem_rd_en(o_dmem_ren),
-        .o_dmem_zero_ext(dmem_zero_ext),
+        .o_dmem_wr_en(dmem_wr_en),
+        .o_dmem_rd_en(dmem_rd_en),
 
         .o_reg_wr_sel(reg_wr_sel),
-        .o_halt(o_retire_halt),
+        .o_halt(halt_signal),
 
         .o_funct3(funct3),
         .o_funct7(funct7)
     );
     
     // Execution Phase
-    wire [31:0] alu_result;
-    wire [31:0] pc_immed;
+    wire [31:0]     alu_result;
+    wire [31:0]     pc_immed;
+    wire            branch_sel;
     exe execution(
         .i_clk(i_clk),
         .i_rst(i_rst),
@@ -221,26 +228,33 @@ module hart #(
         .i_reg_rs1_data(reg_rs1_data),
         .i_reg_rs2_data(reg_rs2_data),
         .i_immed(immed),
-        .i_instr(o_retire_inst),
+        .i_instr(instr),
 
         .o_alu_result(alu_result),
         .o_jump_addr(jump_instr_addr),
         .o_pc_immed(pc_immed),
-        .o_jump_sel(jump_sel)
+        .o_branch_sel(branch_sel)
     );
 
 
 
     // Memory Phase
     wire [31:0]  shifted_mem_data;
+    
     mem memory(
         .i_clk(i_clk),
         .i_rst(i_rst),
 
+        .o_dmem_addr(o_dmem_addr),
+        .o_dmem_ren(o_dmem_ren),
+        .o_dmem_wen(o_dmem_wen),
+        .o_dmem_wdata(o_dmem_wdata),
+        .o_dmem_mask(o_dmem_mask),
+        .i_dmem_rdata(i_dmem_rdata),
+
         .i_dmem_rd_en(dmem_rd_en),
         .i_dmem_wr_en(dmem_wr_en),
         .i_funct3(funct3),
-        .i_zero_extend(dmem_zero_ext),
 
         .o_dmem_wdata(o_dmem_wdata),
         .o_dmem_mask(o_dmem_mask),
@@ -267,6 +281,20 @@ module hart #(
 
         .o_wr_back_data(reg_wr_data)
     );
+
+    // Set all Retire signals at the end of the cycle.
+    assign o_retire_valid = 1'b1;
+    assign o_retire_inst = instr;
+    assign o_retire_trap = ;
+    assign o_retire_halt = ;
+    assign o_retire_rs1_raddr = ;
+    assign o_retire_rs1_raddr = ;
+    assign o_retire_rs1_rdata = ;
+    assign o_retire_rs2_rdata = ;
+    assign o_retire_rd_waddr = ;
+    assign o_retire_rd_wdata = ;
+    assign o_retire_pc = ;
+    assign o_retire_next_pc = ;
 
 
 endmodule
