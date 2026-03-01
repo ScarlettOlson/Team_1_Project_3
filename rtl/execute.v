@@ -21,6 +21,7 @@ module exe(
     input wire [31:0]   i_reg_rs2_data,
     input wire [31:0]   i_immed,
     input wire [31:0]   i_instr,
+    input wire [31:0]   i_pc,
 
     // OutPut Data
     output wire [31:0]  o_alu_result,
@@ -54,7 +55,7 @@ module exe(
 
     // Connect PC/Immediate Adder
     add_pg_32 pcAdder(
-        .val1(i_instr),
+        .val1(i_pc),
         .val2(i_immed),
         .carry_in(1'b0),
         .val_out(o_pc_immed),

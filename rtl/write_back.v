@@ -18,10 +18,10 @@ module wrBack(
     output wire [31:0]  o_wr_back_data
 
 );
-    assign o_wr_back_data = (i_reg_wr_sel == 3'b001) ? i_alu_result :
-                            (i_reg_wr_sel == 3'b011) ? i_immed:
-                            (i_reg_wr_sel == 3'b010) ? i_pc_immed:
-                            (i_reg_wr_sel == 3'b000) ? i_shifted_mem_data:
+    assign o_wr_back_data = (i_reg_wr_sel == 3'b000) ? i_alu_result :
+                            (i_reg_wr_sel == 3'b001) ? i_shifted_mem_data:
+                            (i_reg_wr_sel == 3'b010) ? i_immed:
+                            (i_reg_wr_sel == 3'b011) ? i_pc_immed:
                             (i_reg_wr_sel == 3'b100) ? i_next_pc_addr: 32'h00000000;
 
 endmodule

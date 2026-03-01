@@ -137,6 +137,7 @@ module hart #(
     wire        jump_sel;       // Both Jump pieces are determined during the exe phase
     // Instruction Fetch Phase
     wire [31:0] instr;
+    wire [31:0] pc;
     instrFetch instructionFetch(
         .i_clk(i_clk),
         .i_rst(i_rst),
@@ -149,6 +150,7 @@ module hart #(
         .i_jump_sel(jump_sel),
 
         .o_instr(instr),
+        .o_instr_addr(pc),
         .o_incr_instr_addr(next_instr_addr)
     );
     
@@ -240,6 +242,7 @@ module hart #(
         .i_reg_rs2_data(reg_rs2_data),
         .i_immed(immed),
         .i_instr(instr),
+        .i_pc(pc),
 
         .o_alu_result(alu_result),
         .o_jump_addr(jump_instr_addr),
@@ -297,12 +300,18 @@ module hart #(
     assign o_retire_rd_wdata = reg_wr_data;
     assign o_retire_pc = o_imem_raddr;
     assign o_retire_next_pc = next_instr_addr;
-    assign o_retire_rs1_raddr = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_addr : 5'b00000;
-    assign o_retire_rs2_raddr = (instr_format[0] | instr_format[2] | instr_format[3]) ? reg_rs2_addr : 5'b00000;
-    assign o_retire_rs1_rdata = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_data : 32'h00000000;
-    assign o_retire_rs2_rdata = (instr_format[0] | instr_format[2] | instr_format[3]) ? reg_rs2_data : 32'h00000000;
+    // assign o_retire_rs1_raddr = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_addr : 5'b00000;
+    // assign o_retire_rs2_raddr = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs2_addr : 5'b00000;
+    // assign o_retire_rs1_rdata = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_data : 32'h00000000;
+    // assign o_retire_rs2_rdata = (instr_format[0] | instr_format[2] | instr_format[3]) ? reg_rs2_data : 32'h00000000;
     assign o_retire_rd_waddr = (instr_format[0] | instr_format[1] | instr_format[4] | instr_format[5]) ? reg_rd_addr : 5'b00000;
     assign o_retire_rd_wdata = (instr_format[0] | instr_format[1] | instr_format[4] | instr_format[5]) ? reg_wr_data : 32'h00000000;
+    assign o_retire_rs1_raddr = reg_rs1_addr;
+    assign o_retire_rs2_raddr = reg_rs2_addr;
+    assign o_retire_rs1_rdata = reg_rs1_data;
+    assign o_retire_rs2_rdata = reg_rs2_data;
+    //assign o_retire_rd_waddr =  reg_rd_addr;
+    //assign o_retire_rd_wdata =  reg_wr_data;
 
 
 endmodule

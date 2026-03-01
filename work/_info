@@ -1,0 +1,453 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+d/home/scarlettolson/intelFPGA/20.1/modelsim_ase/bin
+vadd_pg_16
+Z0 !s110 1772313594
+!i10b 1
+!s100 X>J`i8ozPnWHQIKj@I<he3
+Z1 !s11b Dg1SIo80bB@j0V0VzS_@n1
+I99OHlozZ6;2`iJE_QV0Ze1
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+Z3 d/home/scarlettolson/Documents/Class/Architecture/Projects/project3
+w1772190758
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_16.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_16.v
+!i122 153
+L0 3 79
+Z4 OV;L;2020.1;71
+r1
+!s85 0
+31
+Z5 !s108 1772313594.000000
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_16.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_16.v|
+!i113 1
+Z6 o-work work
+Z7 tCvgOpt 0
+vadd_pg_32
+R0
+!i10b 1
+!s100 QBKf39CKBoo2H`i_MS8NY3
+R1
+IgEo`OVSJmn]?0kj;UXgaF2
+R2
+R3
+w1772190686
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_32.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_32.v
+!i122 154
+L0 3 46
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_32.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_32.v|
+!i113 1
+R6
+R7
+vadd_pg_4
+R0
+!i10b 1
+!s100 6e5]lY3CCmUC8azAA<Q3n3
+R1
+IgE;kLkB=<H0JMkQ@LeFBT1
+R2
+R3
+w1772190800
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_4.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_4.v
+!i122 152
+L0 3 38
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_4.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_4.v|
+!i113 1
+R6
+R7
+valu
+R0
+!i10b 1
+!s100 TXJM25`a:Z154?Q6=Od?F3
+R1
+IDU=[`Bb9XIOJ[_RfFYiGd1
+R2
+R3
+w1772302487
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/alu.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/alu.v
+!i122 155
+L0 8 121
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/alu.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/alu.v|
+!i113 1
+R6
+R7
+vb_cntr
+R0
+!i10b 1
+!s100 ?_cNcBb0FG=ZNkm]82`]_3
+R1
+IUS?bEdS_VEUUBQP6_oheL3
+R2
+R3
+w1772238535
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/branch_control.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/branch_control.v
+!i122 156
+L0 3 20
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/branch_control.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/branch_control.v|
+!i113 1
+R6
+R7
+vcntrUnit
+R0
+!i10b 1
+!s100 [jL<JzRBclZR5_GdGldMA1
+R1
+Ihilk8Xzed7R5P69_X9]]@1
+R2
+R3
+w1772303880
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/control_unit.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/control_unit.v
+!i122 157
+L0 3 81
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/control_unit.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/control_unit.v|
+!i113 1
+R6
+R7
+ncntr@unit
+vexe
+R0
+!i10b 1
+!s100 YhkX3;V6Q2B447SLFn:bg1
+R1
+Ii3nkz0Pjc:Q<X=T79k5n70
+R2
+R3
+w1772253677
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/execute.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/execute.v
+!i122 158
+L0 3 77
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/execute.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/execute.v|
+!i113 1
+R6
+R7
+vhart
+R0
+!i10b 1
+!s100 STi?UNFoU^XLK=;o1>e_h1
+R1
+I3fFAHbjClR=eR2JT05N140
+R2
+R3
+w1772313223
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/hart.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/hart.v
+!i122 159
+L0 3 306
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/hart.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/hart.v|
+!i113 1
+R6
+R7
+vhart_tb
+R0
+!i10b 1
+!s100 TDJZM0Ob=YG4@n3>k7omR1
+R1
+I=j;PnNLdL=fjEz0`4[bTE1
+R2
+R3
+w1772031530
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/tb/tb.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/tb/tb.v
+!i122 170
+L0 1 132
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/tb/tb.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/tb/tb.v|
+!i113 1
+R6
+R7
+vimm
+R0
+!i10b 1
+!s100 7`zi<cgU:XKo7U6`jA85S2
+R1
+IcbFR@:Vb3PIeObG<`lh3B2
+R2
+R3
+w1772189636
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/imm.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/imm.v
+!i122 160
+L0 6 39
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/imm.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/imm.v|
+!i113 1
+R6
+R7
+vinstrDecode
+R0
+!i10b 1
+!s100 R_PJUV^o325Q4e`h7VJR>1
+R1
+ImTi<Po3@fjWPV5UL>@BEd2
+R2
+R3
+w1772303902
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/instruction_decode.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/instruction_decode.v
+!i122 161
+L0 3 116
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/instruction_decode.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/instruction_decode.v|
+!i113 1
+R6
+R7
+ninstr@decode
+vinstrFetch
+R0
+!i10b 1
+!s100 eYRjiDkokH<A5nKZIBnPg0
+R1
+I4B`VdVM3R6a90W=`hSekL3
+R2
+R3
+w1772234193
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/instruction_fetch.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/instruction_fetch.v
+!i122 162
+L0 3 43
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/instruction_fetch.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/instruction_fetch.v|
+!i113 1
+R6
+R7
+ninstr@fetch
+vmem
+R0
+!i10b 1
+!s100 3RCFh>EKmD^1jR3^6Qz>>3
+R1
+I^1nFJzZM@;jd`3gRBjz=G1
+R2
+R3
+w1772253783
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/memory.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/memory.v
+!i122 164
+L0 3 69
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/memory.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/memory.v|
+!i113 1
+R6
+R7
+vmemCntr
+R0
+!i10b 1
+!s100 1IT`L49@LF@Nhzdh;EV3R1
+R1
+IIQ[;lF3ooQ]FKS[HRQzaC1
+R2
+R3
+w1772235747
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/mem_mask_control.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/mem_mask_control.v
+!i122 163
+L0 3 12
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/mem_mask_control.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/mem_mask_control.v|
+!i113 1
+R6
+R7
+nmem@cntr
+vpc
+R0
+!i10b 1
+!s100 ?f9ZQUBl08WX7iJJ1`Tk]2
+R1
+ID@dM?S<GM79FR4XGHCn^M3
+R2
+R3
+w1772222150
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/pc.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/pc.v
+!i122 165
+L0 3 26
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/pc.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/pc.v|
+!i113 1
+R6
+R7
+vrf
+R0
+!i10b 1
+!s100 hRdeM_f3`YI<^bbdF[j[c3
+R1
+I1Sd7fAd0NBE_CMBeoO4BO1
+R2
+R3
+w1772222992
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/rf.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/rf.v
+!i122 166
+L0 8 51
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/rf.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/rf.v|
+!i113 1
+R6
+R7
+vset_less_than
+R0
+!i10b 1
+!s100 WIS4Mi=>85=lDnBJU0G8;2
+R1
+I=V9KX>kHkLP8=DF@zK>I00
+R2
+R3
+w1772222280
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/slt.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/slt.v
+!i122 168
+L0 3 36
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/slt.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/slt.v|
+!i113 1
+R6
+R7
+vshifter
+R0
+!i10b 1
+!s100 TW3Gn:3`dk;G8VadEF5iU3
+R1
+IG03933>fPZWIo@B`dGgXC3
+R2
+R3
+w1772235401
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/shifter.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/shifter.v
+!i122 167
+L0 3 61
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/shifter.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/shifter.v|
+!i113 1
+R6
+R7
+vwrBack
+R0
+!i10b 1
+!s100 ^4DcPJi5^Xi1Sfe92_:8C2
+R1
+IDh]>;JTg=<aZD?zFEZfa@2
+R2
+R3
+w1772237067
+8/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/write_back.v
+F/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/write_back.v
+!i122 169
+L0 3 25
+R4
+r1
+!s85 0
+31
+R5
+!s107 /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/write_back.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/write_back.v|
+!i113 1
+R6
+R7
+nwr@back

@@ -13,6 +13,7 @@ module instrFetch(
     input wire          i_jump_sel,
 
     output wire [31:0]  o_instr,
+    output wire [31:0]  o_instr_addr,
     output wire [31:0]  o_incr_instr_addr
 );  
     // Deside what the next Instruction will be
@@ -41,6 +42,7 @@ module instrFetch(
     // Decode instruction from the Instruction Memory
     assign o_imem_raddr = instr_addr;
     assign o_instr = i_imem_rdata;
+    assign o_instr_addr = instr_addr;
 
 endmodule
 `default_nettype wire

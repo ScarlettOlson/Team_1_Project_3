@@ -1,0 +1,134 @@
+/home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/hart.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/hart.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module hart
+
+Top level modules:
+	hart
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/tb/tb.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/tb/tb.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module hart_tb
+
+Top level modules:
+	hart_tb
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_4.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_4.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module add_pg_4
+
+Top level modules:
+	add_pg_4
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/alu.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/alu.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module alu
+
+Top level modules:
+	alu
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/mem_mask_control.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/mem_mask_control.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module memCntr
+
+Top level modules:
+	memCntr
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/slt.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/slt.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module set_less_than
+
+Top level modules:
+	set_less_than
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/pc.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/pc.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module pc
+
+Top level modules:
+	pc
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/instruction_fetch.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/instruction_fetch.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module instrFetch
+
+Top level modules:
+	instrFetch
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/branch_control.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/branch_control.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module b_cntr
+
+Top level modules:
+	b_cntr
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/rf.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/rf.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module rf
+
+Top level modules:
+	rf
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/control_unit.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/control_unit.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module cntrUnit
+
+Top level modules:
+	cntrUnit
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/memory.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/memory.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module mem
+
+Top level modules:
+	mem
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/write_back.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/write_back.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module wrBack
+
+Top level modules:
+	wrBack
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_32.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_32.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module add_pg_32
+
+Top level modules:
+	add_pg_32
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/execute.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/execute.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module exe
+
+Top level modules:
+	exe
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/imm.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/imm.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module imm
+
+Top level modules:
+	imm
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/shifter.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/shifter.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module shifter
+
+Top level modules:
+	shifter
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_16.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/add_pg_16.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module add_pg_16
+
+Top level modules:
+	add_pg_16
+
+} {} {}} /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/instruction_decode.v {1 {vlog -work work -stats=none /home/scarlettolson/Documents/Class/Architecture/Projects/project3/rtl/instruction_decode.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module instrDecode
+
+Top level modules:
+	instrDecode
+
+} {} {}}

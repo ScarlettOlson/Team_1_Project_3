@@ -60,7 +60,7 @@ module cntrUnit(
     assign o_alu_op_sel[0] =    (is_reg_arith_instr | is_immed_arith_instr) ? (i_funct3[0] | (i_funct3 == 3'b010))  : 1'b0;        
     assign o_alu_op_sel[1] =    (is_reg_arith_instr | is_immed_arith_instr) ? i_funct3[1]                           : 1'b0;
     assign o_alu_op_sel[2] =    (is_reg_arith_instr | is_immed_arith_instr) ? i_funct3[2]                           : 1'b0;
-    assign o_alu_sub_sel =      ((is_reg_arith_instr | is_immed_arith_instr) & (i_funct3 == 3'b000)) ? i_funct7[5]    : 1'b0;
+    assign o_alu_sub_sel =      ((is_reg_arith_instr) & (i_funct3 == 3'b000)) ? i_funct7[5]    : 1'b0;
     assign o_alu_sign_sel =     ((is_reg_arith_instr | is_immed_arith_instr) & (i_funct3 == 3'b011)) ? 1'b1           : (is_branch_instr) ? i_funct3[1]   : 1'b0;
     assign o_alu_arith_sel =    ((is_reg_arith_instr | is_immed_arith_instr) & (i_funct3 == 3'b101)) ? i_funct7[5]    : 1'b0;
 
