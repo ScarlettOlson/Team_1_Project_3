@@ -300,18 +300,12 @@ module hart #(
     assign o_retire_rd_wdata = reg_wr_data;
     assign o_retire_pc = o_imem_raddr;
     assign o_retire_next_pc = next_instr_addr;
-    // assign o_retire_rs1_raddr = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_addr : 5'b00000;
-    // assign o_retire_rs2_raddr = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs2_addr : 5'b00000;
-    // assign o_retire_rs1_rdata = (instr_format[0] | instr_format[1] | instr_format[2] | instr_format[3]) ? reg_rs1_data : 32'h00000000;
-    // assign o_retire_rs2_rdata = (instr_format[0] | instr_format[2] | instr_format[3]) ? reg_rs2_data : 32'h00000000;
-    assign o_retire_rd_waddr = (instr_format[0] | instr_format[1] | instr_format[4] | instr_format[5]) ? reg_rd_addr : 5'b00000;
-    assign o_retire_rd_wdata = (instr_format[0] | instr_format[1] | instr_format[4] | instr_format[5]) ? reg_wr_data : 32'h00000000;
+    assign o_retire_rd_waddr = (instr_format[0] | instr_format[1] | instr_format[4] | instr_format[5]) ? reg_rd_addr : 5'b00000;        // Set to zero if memory write is not enable
+    assign o_retire_rd_wdata = (instr_format[0] | instr_format[1] | instr_format[4] | instr_format[5]) ? reg_wr_data : 32'h00000000;    // Set to zero if memory read is not enable
     assign o_retire_rs1_raddr = reg_rs1_addr;
     assign o_retire_rs2_raddr = reg_rs2_addr;
     assign o_retire_rs1_rdata = reg_rs1_data;
     assign o_retire_rs2_rdata = reg_rs2_data;
-    //assign o_retire_rd_waddr =  reg_rd_addr;
-    //assign o_retire_rd_wdata =  reg_wr_data;
 
 
 endmodule

@@ -27,7 +27,7 @@ module mem(
 );
     // Create shift values
     wire [4:0] shift_amt;
-    assign shift_amt = {i_reg_rs2_data[1:0], 3'b000};
+    assign shift_amt = {i_alu_result[1:0], 3'b000};
 
     // Connect Input Shifter
     wire [31:0] dmem_input_data;
@@ -68,7 +68,8 @@ module mem(
         .shift_arith(i_funct3[2]),
         .shifted_val(dmem_shifted_data)
     );
-    assign o_dmem_shifted_data = mask[3]                 ? dmem_shifted_data :
+    assign o_dmem_shifted_data = i_dmem_rd_en            ? dmem_data_out : 
+                                 mask[3]                 ? dmem_shifted_data :
                                  mask[1] & !i_funct3[2]  ? {{16{dmem_shifted_data[15]}}, dmem_shifted_data[15:0]} :
                                  mask[1] & i_funct3[2]   ? {{16{1'b0}}, dmem_shifted_data[15:0]} :
                                  !i_funct3[2]            ? {{24{dmem_shifted_data[7]}}, dmem_shifted_data[7:0]}   :
