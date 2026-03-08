@@ -252,6 +252,9 @@ module hart #(
     i_instr(id_alu_sign_sel) ;
     wire id_alu_arith_sel ;
     i_instr(id_alu_arith_sel) ;
+
+    wire id_jump_type_sel ;
+    i_instr(id_jump_type_sel) ;
     
     // Execution Phase
     wire [31:0]     alu_result;
