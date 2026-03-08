@@ -246,6 +246,30 @@ module hart #(
 
         .o_format(instr_format)
     );
+    //pipelined outputs
+    wire [4:0] id_reg_rd_addr ;
+    i_instr(id_reg_rd_addr) ;
+    wire [4:0] id_reg_rs1_addr ;
+    i_instr(id_reg_rs1_addr) ;
+    wire [4:0] id_reg_rs2_addr ;
+    i_instr(id_reg_rs2_addr) ;
+    wire [31:0] id_reg_rs1_data ;
+    i_instr(id_reg_rs1_data) ;
+    wire [31:0] id_reg_rs2_data ;
+    i_instr(id_reg_rs2_data) ;
+    wire [31:0] id_immed ;
+    i_instr(id_immed) ;
+
+    wire id_alu_input_sel ;
+    i_instr(id_alu_input_sel) ;
+    wire [2:0] id_alu_op_sel ;
+    i_instr(id_alu_op_sel) ;
+    wire id_alu_sub_sel;
+    i_instr(id_alu_sub_sel) ;
+    wire id_alu_sign_sel ;
+    i_instr(id_alu_sign_sel) ;
+    wire id_alu_arith_sel ;
+    i_instr(id_alu_arith_sel) ;
     
     // Execution Phase
     wire [31:0]     alu_result;
