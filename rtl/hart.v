@@ -155,6 +155,15 @@ module hart #(
     );
     
     // Instruction Decode Phase
+
+    // pipelined outputs
+    wire [31:0] if_instr ;
+    .i_instr(if_instr) ;
+    wire [31:0] if_pc ;
+    .i_instr(if_pc) ;
+    wire [31:0] if_next_instr_addr ;
+    .i_instr(if_next_instr_addr) ;
+
     wire [31:0] reg_wr_data;        // This Value is selected later, in the Write Back Phase
 
     wire [4:0]  reg_rd_addr;
