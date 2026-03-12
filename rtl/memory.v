@@ -23,7 +23,7 @@ module mem(
     
     
     // Output Data
-    output wire [31:0]  o_dmem_rdata
+    output wire [31:0]  o_dmem_out
 );
     // Generate the mask Signal
     wire [3:0] mask;
@@ -69,7 +69,7 @@ module mem(
     assign zero_half =  i_dmem_rd_en & i_funct3 == 3'b101;
 
     // Output Memory Shifted and extended
-    assign o_dmem_rdata =   sign_byte ? {{24{dmem_shifted_data[7]}}, dmem_shifted_data[7:0]} :
+    assign o_dmem_out   =   sign_byte ? {{24{dmem_shifted_data[7]}}, dmem_shifted_data[7:0]} :
                             sign_half ? {{16{dmem_shifted_data[15]}}, dmem_shifted_data[15:0]} :
                             word      ? i_dmem_rdata :
                             zero_byte ? {{24{1'b0}}, dmem_shifted_data[7:0]} :
