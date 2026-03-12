@@ -6,11 +6,11 @@ module memCntr(
     input wire          is_store,
 
     output wire [3:0]  o_dmem_mask
-
+);
     assign is_byte = !i_funct3[0] & !i_funct3[1];
     assign is_half = i_funct3[0];
     assign is_word = i_funct3[1];
-    
+
     // Generate memory Mask
     assign o_dmem_mask[0] = is_word | (is_half & (i_pos == 2'b00)) | (is_byte & (i_pos == 2'b00));
     assign o_dmem_mask[1] = is_word | (is_half & (i_pos == 2'b00)) | (is_byte & (i_pos == 2'b01));
