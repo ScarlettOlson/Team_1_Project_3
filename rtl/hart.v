@@ -155,6 +155,46 @@ module hart #(
     );
     
     // Instruction Decode Phase
+    wire [31:0] id_instr;
+    wire [31:0] id_imem_raddr;
+    wire [31:0] id_pc;
+    wire [31:0] id_pc_plus_4;      // The Address of the subsequent instruction
+    if_id_register if_id_reg(
+        .i_instr(if_instr),
+        .i_imem_rdata(o_imem_raddr),
+        .i_pc(if_pc),
+        .i_pc_plus_4(if_pc_plus_4),
+
+        .o_instr(id_instr),
+        .o_i_imme_rdata(id_imem_raddr),
+        .o_pc(id_pc),
+        .o_pc_plus_4(id_pc_plus_4)
+    )
+
+
+    // pipelined outputs
+    wire [31:0] if_instr ;
+    .i_instr(if_instr) ;
+    wire [31:0] if_pc ;
+    .i_instr(if_pc) ;
+    wire [31:0] if_next_instr_addr ;
+    .i_instr(if_next_instr_addr) ;
+    wire [31:0] if_jump_instr_addr;
+    .i_instr(if_jump_instr_addr);
+
+    wire [31:0] if_o_dmem_addr;
+    i_instr(if_o_dmem_addr);
+    wire if_o_dmem_ren;
+    i_instr(if_o_dmem_ren);
+    wire if_o_dmem_wen;
+    i_instr(if_o_dmem_wen);
+    wire [31:0] if_o_dmem_wdata;
+    i_instr(if_o_dmem_wdata);
+    wire [3:0] if_o_dmem_mask;
+    i_instr(if_o_dmem_mask);
+    wire [31:0] if_o_dmem_rdata;
+    i_instr(if_o_dmem_rdata);
+
     wire [31:0] reg_wr_data;        // This Value is selected later, in the Write Back Phase
 
     wire [4:0]  reg_rd_addr;
@@ -219,6 +259,78 @@ module hart #(
 
         .o_format(instr_format)
     );
+    //pipelined outputs
+    wire [4:0] id_reg_rd_addr ;
+    i_instr(id_reg_rd_addr) ;
+    wire [4:0] id_reg_rs1_addr ;
+    i_instr(id_reg_rs1_addr) ;
+    wire [4:0] id_reg_rs2_addr ;
+    i_instr(id_reg_rs2_addr) ;
+    wire [31:0] id_reg_rs1_data ;
+    i_instr(id_reg_rs1_data) ;
+    wire [31:0] id_reg_rs2_data ;
+    i_instr(id_reg_rs2_data) ;
+    wire [31:0] id_immed ;
+    i_instr(id_immed) ;
+    wire [31:0] id_reg_wr_data;
+    i_instr(id_reg_wr_data);
+
+    wire id_alu_input_sel ;
+    i_instr(id_alu_input_sel) ;
+    wire [2:0] id_alu_op_sel ;
+    i_instr(id_alu_op_sel) ;
+    wire id_alu_sub_sel;
+    i_instr(id_alu_sub_sel) ;
+    wire id_alu_sign_sel ;
+    i_instr(id_alu_sign_sel) ;
+    wire id_alu_arith_sel ;
+    i_instr(id_alu_arith_sel) ;
+
+    wire id_jump_type_sel ;
+    i_instr(id_jump_type_sel) ;
+    wire id_jump_sel;
+    i_instr(id_jump_sel);
+
+    wire id_dmem_wr_en;
+    i_instr(id_dmem_wr_en);
+    wire id_dmem_rd_en;
+    i_instr(id_dmem_rd_en);
+
+    wire [2:0] id_reg_wr_sel;
+    i_instr(id_reg_wr_sel);
+    wire id_halt_signal;
+    i_instr(id_halt_signal);
+    wire id_trap_signal;
+    i_instr(id_trap_signal);
+
+    wire [2:0] id_funct3;
+    i_instr(id_funct3);
+    wire [6:0] id_funct7;
+    i_instr(id_funct7);
+    wire [5:0] id_instr_format;
+    i_instr(id_instr_format);
+
+    wire [31:0] id_instr ;
+    .i_instr(id_instr) ;
+    wire [31:0] id_pc ;
+    .i_instr(id_pc) ;
+    wire [31:0] id_next_instr_addr ;
+    .i_instr(id_next_instr_addr) ;
+    wire [31:0] id_jump_instr_addr;
+    .i_instr(id_jump_instr_addr);
+
+    wire [31:0] id_o_dmem_addr;
+    i_instr(id_o_dmem_addr);
+    wire id_o_dmem_ren;
+    i_instr(id_o_dmem_ren);
+    wire id_o_dmem_wen;
+    i_instr(id_o_dmem_wen);
+    wire [31:0] id_o_dmem_wdata;
+    i_instr(id_o_dmem_wdata);
+    wire [3:0] id_o_dmem_mask;
+    i_instr(id_o_dmem_mask);
+    wire [31:0] id_o_dmem_rdata;
+    i_instr(id_o_dmem_rdata);
     
     // Execution Phase
     wire [31:0]     alu_result;
@@ -250,6 +362,87 @@ module hart #(
         .o_branch_sel(branch_sel)
     );
 
+    // pipelined outputs
+    wire [31:0] ex_alu_result;
+    i_instr(ex_alu_result);
+    wire [31:0] ex_jump_instr_addr;
+    i_instr(ex_jump_instr_addr);
+    wire [31:0] ex_pc_immed;
+    i_instr(ex_pc_immed);
+    wire ex_branch_sel;
+    i_instr(ex_branch_sel);
+
+    wire [4:0] ex_reg_rd_addr ;
+    i_instr(ex_reg_rd_addr) ;
+    wire [4:0] ex_reg_rs1_addr ;
+    i_instr(ex_reg_rs1_addr) ;
+    wire [4:0] ex_reg_rs2_addr ;
+    i_instr(ex_reg_rs2_addr) ;
+    wire [31:0] ex_reg_rs1_data ;
+    i_instr(ex_reg_rs1_data) ;
+    wire [31:0] ex_reg_rs2_data ;
+    i_instr(ex_reg_rs2_data) ;
+    wire [31:0] ex_immed ;
+    i_instr(ex_immed) ;
+    wire [31:0] ex_reg_wr_data;
+    i_instr(ex_reg_wr_data);
+
+    wire ex_alu_input_sel ;
+    i_instr(ex_alu_input_sel) ;
+    wire [2:0] ex_alu_op_sel ;
+    i_instr(ex_alu_op_sel) ;
+    wire ex_alu_sub_sel;
+    i_instr(ex_alu_sub_sel) ;
+    wire ex_alu_sign_sel ;
+    i_instr(ex_alu_sign_sel) ;
+    wire ex_alu_arith_sel ;
+    i_instr(ex_alu_arith_sel) ;
+
+    wire ex_jump_type_sel ;
+    i_instr(ex_jump_type_sel) ;
+    wire ex_jump_sel;
+    i_instr(ex_jump_sel);
+
+    wire ex_dmem_wr_en;
+    i_instr(ex_dmem_wr_en);
+    wire ex_dmem_rd_en;
+    i_instr(ex_dmem_rd_en);
+
+    wire [2:0] ex_reg_wr_sel;
+    i_instr(ex_reg_wr_sel);
+    wire ex_halt_signal;
+    i_instr(ex_halt_signal);
+    wire ex_trap_signal;
+    i_instr(ex_trap_signal);
+
+    wire [2:0] ex_funct3;
+    i_instr(ex_funct3);
+    wire [6:0] ex_funct7;
+    i_instr(ex_funct7);
+    wire [5:0] ex_instr_format;
+    i_instr(ex_instr_format);
+
+    wire [31:0] ex_instr ;
+    .i_instr(ex_instr) ;
+    wire [31:0] ex_pc ;
+    .i_instr(ex_pc) ;
+    wire [31:0] ex_next_instr_addr ;
+    .i_instr(ex_next_instr_addr) ;
+    wire [31:0] ex_jump_instr_addr;
+    .i_instr(ex_jump_instr_addr);
+
+    wire [31:0] ex_o_dmem_addr;
+    i_instr(ex_o_dmem_addr);
+    wire ex_o_dmem_ren;
+    i_instr(ex_o_dmem_ren);
+    wire ex_o_dmem_wen;
+    i_instr(ex_o_dmem_wen);
+    wire [31:0] ex_o_dmem_wdata;
+    i_instr(ex_o_dmem_wdata);
+    wire [3:0] ex_o_dmem_mask;
+    i_instr(ex_o_dmem_mask);
+    wire [31:0] ex_o_dmem_rdata;
+    i_instr(ex_o_dmem_rdata);
 
 
     // Memory Phase
@@ -273,8 +466,91 @@ module hart #(
         .i_alu_result(alu_result),
         .i_reg_rs2_data(reg_rs2_data),
 
-        .o_dmem_rdata(shifted_mem_data)
+        .o_dmem_shifted_data(shifted_mem_data)
     );
+    // pipelined outputs
+    wire [31:0] mem_o_dmem_addr;
+    i_instr(mem_o_dmem_addr);
+    wire mem_o_dmem_ren;
+    i_instr(mem_o_dmem_ren);
+    wire mem_o_dmem_wen;
+    i_instr(mem_o_dmem_wen);
+    wire [31:0] mem_o_dmem_wdata;
+    i_instr(mem_o_dmem_wdata);
+    wire [3:0] mem_o_dmem_mask;
+    i_instr(mem_o_dmem_mask);
+    wire [31:0] mem_o_dmem_rdata;
+    i_instr(mem_o_dmem_rdata);
+    wire [31:0] mem_shifted_mem_data;
+    i_instr(mem_shifted_mem_data);
+
+    wire [31:0] mem_alu_result;
+    i_instr(mem_alu_result);
+    wire [31:0] mem_jump_instr_addr;
+    i_instr(mem_jump_instr_addr);
+    wire [31:0] mem_pc_immed;
+    i_instr(mem_pc_immed);
+    wire mem_branch_sel;
+    i_instr(mem_branch_sel);
+
+    wire [4:0] mem_reg_rd_addr ;
+    i_instr(mem_reg_rd_addr) ;
+    wire [4:0] mem_reg_rs1_addr ;
+    i_instr(mem_reg_rs1_addr) ;
+    wire [4:0] mem_reg_rs2_addr ;
+    i_instr(mem_reg_rs2_addr) ;
+    wire [31:0] mem_reg_rs1_data ;
+    i_instr(mem_reg_rs1_data) ;
+    wire [31:0] mem_reg_rs2_data ;
+    i_instr(mem_reg_rs2_data) ;
+    wire [31:0] mem_immed ;
+    i_instr(mem_immed) ;
+    wire [31:0] mem_reg_wr_data;
+    i_instr(mem_reg_wr_data);
+
+    wire mem_alu_input_sel ;
+    i_instr(mem_alu_input_sel) ;
+    wire [2:0] mem_alu_op_sel ;
+    i_instr(mem_alu_op_sel) ;
+    wire mem_alu_sub_sel;
+    i_instr(mem_alu_sub_sel) ;
+    wire mem_alu_sign_sel ;
+    i_instr(mem_alu_sign_sel) ;
+    wire mem_alu_arith_sel ;
+    i_instr(mem_alu_arith_sel) ;
+
+    wire mem_jump_type_sel ;
+    i_instr(mem_jump_type_sel) ;
+    wire mem_jump_sel;
+    i_instr(mem_jump_sel);
+
+    wire mem_dmem_wr_en;
+    i_instr(mem_dmem_wr_en);
+    wire mem_dmem_rd_en;
+    i_instr(mem_dmem_rd_en);
+
+    wire [2:0] mem_reg_wr_sel;
+    i_instr(mem_reg_wr_sel);
+    wire mem_halt_signal;
+    i_instr(mem_halt_signal);
+    wire mem_trap_signal;
+    i_instr(mem_trap_signal);
+
+    wire [2:0] mem_funct3;
+    i_instr(mem_funct3);
+    wire [6:0] mem_funct7;
+    i_instr(mem_funct7);
+    wire [5:0] mem_instr_format;
+    i_instr(mem_instr_format);
+
+    wire [31:0] mem_instr ;
+    .i_instr(mem_instr) ;
+    wire [31:0] mem_pc ;
+    .i_instr(mem_pc) ;
+    wire [31:0] mem_next_instr_addr ;
+    .i_instr(mem_next_instr_addr) ;
+    wire [31:0] mem_jump_instr_addr;
+    .i_instr(mem_jump_instr_addr);
 
     // Write Back Phase
     wrBack writeBack(
@@ -291,6 +567,89 @@ module hart #(
 
         .o_wr_back_data(reg_wr_data)
     );
+    // pipelined outputs
+    wire [31:0] wr_o_dmem_addr;
+    i_instr(wr_o_dmem_addr);
+    wire wr_o_dmem_ren;
+    i_instr(wr_o_dmem_ren);
+    wire wr_o_dmem_wen;
+    i_instr(wr_o_dmem_wen);
+    wire [31:0] wr_o_dmem_wdata;
+    i_instr(wr_o_dmem_wdata);
+    wire [3:0] wr_o_dmem_mask;
+    i_instr(wr_o_dmem_mask);
+    wire [31:0] wr_o_dmem_rdata;
+    i_instr(wr_o_dmem_rdata);
+    wire [31:0] wr_shifted_mem_data;
+    i_instr(wr_shifted_mem_data);
+
+    wire [31:0] wr_alu_result;
+    i_instr(wr_alu_result);
+    wire [31:0] wr_jump_instr_addr;
+    i_instr(wr_jump_instr_addr);
+    wire [31:0] wr_pc_immed;
+    i_instr(wr_pc_immed);
+    wire wr_branch_sel;
+    i_instr(wr_branch_sel);
+
+    wire [4:0] wr_reg_rd_addr ;
+    i_instr(wr_reg_rd_addr) ;
+    wire [4:0] wr_reg_rs1_addr ;
+    i_instr(wr_reg_rs1_addr) ;
+    wire [4:0] wr_reg_rs2_addr ;
+    i_instr(wr_reg_rs2_addr) ;
+    wire [31:0] wr_reg_rs1_data ;
+    i_instr(wr_reg_rs1_data) ;
+    wire [31:0] wr_reg_rs2_data ;
+    i_instr(wr_reg_rs2_data) ;
+    wire [31:0] wr_immed ;
+    i_instr(wr_immed) ;
+    wire [31:0] wr_reg_wr_data;
+    i_instr(wr_reg_wr_data);
+
+    wire wr_alu_input_sel ;
+    i_instr(wr_alu_input_sel) ;
+    wire [2:0] wr_alu_op_sel ;
+    i_instr(wr_alu_op_sel) ;
+    wire wr_alu_sub_sel;
+    i_instr(wr_alu_sub_sel) ;
+    wire wr_alu_sign_sel ;
+    i_instr(wr_alu_sign_sel) ;
+    wire wr_alu_arith_sel ;
+    i_instr(wr_alu_arith_sel) ;
+
+    wire wr_jump_type_sel ;
+    i_instr(wr_jump_type_sel) ;
+    wire wr_jump_sel;
+    i_instr(wr_jump_sel);
+
+    wire wr_dmem_wr_en;
+    i_instr(wr_dmem_wr_en);
+    wire wr_dmem_rd_en;
+    i_instr(wr_dmem_rd_en);
+
+    wire [2:0] wr_reg_wr_sel;
+    i_instr(wr_reg_wr_sel);
+    wire wr_halt_signal;
+    i_instr(wr_halt_signal);
+    wire wr_trap_signal;
+    i_instr(wr_trap_signal);
+
+    wire [2:0] wr_funct3;
+    i_instr(wr_funct3);
+    wire [6:0] wr_funct7;
+    i_instr(wr_funct7);
+    wire [5:0] wr_instr_format;
+    i_instr(wr_instr_format);
+
+    wire [31:0] wr_instr ;
+    .i_instr(wr_instr) ;
+    wire [31:0] wr_pc ;
+    .i_instr(wr_pc) ;
+    wire [31:0] wr_next_instr_addr ;
+    .i_instr(wr_next_instr_addr) ;
+    wire [31:0] wr_jump_instr_addr;
+    .i_instr(wr_jump_instr_addr);
 
     // Set all Retire signals at the end of the cycle.
     assign o_retire_valid = 1'b1;
