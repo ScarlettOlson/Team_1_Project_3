@@ -171,7 +171,7 @@ module hart #(
         .o_i_imme_rdata(id_imem_raddr),
         .o_pc(id_pc),
         .o_pc_plus_4(id_pc_plus_4)
-    )
+    );
 
 
     // pipelined outputs

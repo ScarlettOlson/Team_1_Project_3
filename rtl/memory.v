@@ -23,23 +23,9 @@ module mem(
     
     
     // Output Data
-    output wire [31:0]  o_dmem_shifted_data
+    output wire [31:0]  o_dmem_rdata
 );
-    // Create shift values
-    wire [4:0] shift_amt;
-    assign shift_amt = {i_alu_result[1:0], 3'b000};
-
-    // Connect Input Shifter
-    wire [31:0] dmem_input_data;
-    shifter memInputShifter(
-        .val(i_reg_rs2_data),
-        .shamt(shift_amt),
-        .shift_right(1'b1),
-        .shift_arith(1'b0),
-        .shifted_val(dmem_input_data)
-    );
-
-    // Connect Mask Generator
+    // Generate the mask Signal
     wire [3:0] mask;
     memCntr memoryControl(
         .i_funct3(i_funct3),
@@ -48,32 +34,37 @@ module mem(
 
         .o_dmem_mask(mask)
     );
+    assign o_dmem_mask =    mask;
 
     // Connect Memory Module Pass Through
-    assign o_dmem_addr =    {i_alu_result[31:2], 2'b00};
     assign o_dmem_ren =     i_dmem_rd_en;
     assign o_dmem_wen =     i_dmem_wr_en;
-    assign o_dmem_wdata =   dmem_input_data;
-    assign o_dmem_mask =    mask;
-    wire [31:0] dmem_data_out;
-    assign dmem_data_out =  i_dmem_rdata;
-
+    assign o_dmem_addr =    {i_alu_result[31:2], 2'b00};
+    assign o_dmem_wdata =   i_reg_rs2_data;
     
-
+    // Load Shifter
     wire [31:0] dmem_shifted_data;
     shifter memoryOutputShifter(
-        .val(dmem_data_out),
-        .shamt(shift_amt),
+        .val(i_dmem_rdata),
+        .shamt(I_alu_result[1:0]),
         .shift_right(1'b1),
         .shift_arith(i_funct3[2]),
         .shifted_val(dmem_shifted_data)
     );
-    assign o_dmem_shifted_data = i_dmem_rd_en            ? dmem_data_out : 
-                                 mask[3]                 ? dmem_shifted_data :
-                                 mask[1] & !i_funct3[2]  ? {{16{dmem_shifted_data[15]}}, dmem_shifted_data[15:0]} :
-                                 mask[1] & i_funct3[2]   ? {{16{1'b0}}, dmem_shifted_data[15:0]} :
-                                 !i_funct3[2]            ? {{24{dmem_shifted_data[7]}}, dmem_shifted_data[7:0]}   :
-                                                           {{24{1'b0}}, dmem_shifted_data[7:0]};
+    // Determine Load Type
+    assign sign_byte =  i_dmem_rd_en & i_funct3 == 3'b000;
+    assign sign_half =  i_dmem_rd_en & i_funct3 == 3'b001;
+    assign word =       i_dmem_rd_en & i_funct3 == 3'b010;
+    assign zero_byte =  i_dmem_rd_en & i_funct3 == 3'b100;
+    assign zero_half =  i_dmem_rd_en & i_funct3 == 3'b101;
+
+    // Output Memory Shifted and extended
+    assign o_dmem_rdata =   sign_byte ? {{24{dmem_shifted_data[7]}}, dmem_shifted_data[7:0]} :
+                            sign_half ? {{16{dmem_shifted_data[15]}}, dmem_shifted_data[15:0]} :
+                            word      ? i_dmem_rdata :
+                            zero_byte ? {{24{1'b0}}, dmem_shifted_data[7:0]} :
+                            zero_half ? {{16{1'b0}}, dmem_shifted_data[15:0]} :
+                                        32'h0000_0000;
     
 endmodule
 
