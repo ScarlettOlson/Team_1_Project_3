@@ -132,56 +132,29 @@ module hart #(
     ,`RVFI_OUTPUTS,
 `endif
 );
+    wire [31:0] next_instr_addr;// The Address of the subsequent instruction
     wire [31:0] jump_instr_addr;// The Instruction to jump to if branch is taken 
     wire        jump_sel;       // Both Jump pieces are determined during the exe phase
     // Instruction Fetch Phase
-    wire [31:0] if_instr;
-    wire [31:0] if_imem_raddr;
-    wire [31:0] if_pc;
-    wire [31:0] if_pc_plus_4;      // The Address of the subsequent instruction
-
+    wire [31:0] instr;
+    wire [31:0] pc;
     instrFetch instructionFetch(
         .i_clk(i_clk),
         .i_rst(i_rst),
 
-        .o_imem_raddr(if_imem_raddr),
+        .o_imem_raddr(o_imem_raddr),
         .i_imem_rdata(i_imem_rdata),
 
         .i_next_instr_addr(next_instr_addr),
         .i_jump_instr_addr(jump_instr_addr),
         .i_jump_sel(jump_sel),
 
-        .o_instr(if_instr),
-        .o_instr_addr(if_pc),
-        .o_incr_instr_addr(if_pc_plus_4)
+        .o_instr(instr),
+        .o_instr_addr(pc),
+        .o_incr_instr_addr(next_instr_addr)
     );
     
     // Instruction Decode Phase
-    wire [31:0] id_instr;
-    wire [31:0] id_imem_raddr;
-    wire [31:0] id_pc;
-    wire [31:0] id_pc_plus_4;      // The Address of the subsequent instruction
-    if_id_register if_id_reg(
-        .i_instr(if_instr),
-        .i_imem_rdata(o_imem_raddr),
-        .i_pc(if_pc),
-        .i_pc_plus_4(if_pc_plus_4),
-
-        .o_instr(id_instr),
-        .o_i_imme_rdata(id_imem_raddr),
-        .o_pc(id_pc),
-        .o_pc_plus_4(id_pc_plus_4)
-    );
-
-
-    // pipelined outputs
-    wire [31:0] if_instr ;
-    .i_instr(if_instr) ;
-    wire [31:0] if_pc ;
-    .i_instr(if_pc) ;
-    wire [31:0] if_next_instr_addr ;
-    .i_instr(if_next_instr_addr) ;
-
     wire [31:0] reg_wr_data;        // This Value is selected later, in the Write Back Phase
 
     wire [4:0]  reg_rd_addr;
@@ -246,33 +219,6 @@ module hart #(
 
         .o_format(instr_format)
     );
-    //pipelined outputs
-    wire [4:0] id_reg_rd_addr ;
-    i_instr(id_reg_rd_addr) ;
-    wire [4:0] id_reg_rs1_addr ;
-    i_instr(id_reg_rs1_addr) ;
-    wire [4:0] id_reg_rs2_addr ;
-    i_instr(id_reg_rs2_addr) ;
-    wire [31:0] id_reg_rs1_data ;
-    i_instr(id_reg_rs1_data) ;
-    wire [31:0] id_reg_rs2_data ;
-    i_instr(id_reg_rs2_data) ;
-    wire [31:0] id_immed ;
-    i_instr(id_immed) ;
-
-    wire id_alu_input_sel ;
-    i_instr(id_alu_input_sel) ;
-    wire [2:0] id_alu_op_sel ;
-    i_instr(id_alu_op_sel) ;
-    wire id_alu_sub_sel;
-    i_instr(id_alu_sub_sel) ;
-    wire id_alu_sign_sel ;
-    i_instr(id_alu_sign_sel) ;
-    wire id_alu_arith_sel ;
-    i_instr(id_alu_arith_sel) ;
-
-    wire id_jump_type_sel ;
-    i_instr(id_jump_type_sel) ;
     
     // Execution Phase
     wire [31:0]     alu_result;
