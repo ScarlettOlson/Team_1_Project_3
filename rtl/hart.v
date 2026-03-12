@@ -136,7 +136,7 @@ module hart #(
     wire [31:0] if_instr;
     wire [31:0] if_pc;
     wire [31:0] if_pc_plus_4;
-    wire [31:0] wr_jump_instr_addr;
+    wire [31:0] exe_jump_instr_addr;
     wire        exe_jump_sel;
     instrFetch instructionFetch(
         .i_clk(i_clk),
@@ -145,7 +145,7 @@ module hart #(
         .i_imem_rdata(i_imem_rdata),
 
         .i_next_instr_addr(if_pc_plus_4),
-        .i_jump_instr_addr(wr_jump_instr_addr),
+        .i_jump_instr_addr(exe_jump_instr_addr),
         .i_jump_sel(exe_jump_sel),
 
         .o_instr(if_instr),
@@ -235,6 +235,7 @@ module hart #(
     wire [2:0]  exe_funct3;                      // Function Codes and Format
     wire [6:0]  exe_funct7;
     wire [5:0]  exe_instr_format;
+    wire [31:0] exe_next_instr_addr;
     id_exe_reg id_exe_register(
         .i_clk(i_clk),
 
@@ -294,8 +295,7 @@ module hart #(
     );
     
     // Execution Phase
-    wire [31:0]     exe_alu_result, exe_jump_instr_addr, exe_pc_immed;
-    wire            exe_branch_sel;
+    wire [31:0]     exe_alu_result, exe_pc_immed;
     exe execution(
         .i_clk(i_clk),
         .i_rst(i_rst),
@@ -315,11 +315,13 @@ module hart #(
         .i_immed(exe_immed),
         .i_instr(exe_instr),
         .i_pc(exe_pc),
+        .i_pc_plus_4(exe_pc_plus_4),
 
         .o_alu_result(exe_alu_result),
         .o_jump_addr(exe_jump_instr_addr),
         .o_pc_immed(exe_pc_immed),
-        .o_branch_sel(exe_branch_sel)
+        .o_jump_sel(exe_jump_sel),
+        .o_next_instr_addr(exe_next_instr_addr)
     );
 
     // EXE/MEM Pipeline Register
@@ -340,8 +342,7 @@ module hart #(
     wire [5:0]  mem_instr_format;
 
     // Execution Stage Items
-    wire [31:0]     mem_alu_result, mem_jump_instr_addr, mem_pc_immed;
-    wire            mem_branch_sel;
+    wire [31:0]     mem_alu_result, mem_pc_immed, mem_next_instr_addr;
     exe_mem_reg exe_mem_register(
         .i_clk(i_clk),
 
@@ -364,9 +365,8 @@ module hart #(
         .i_instr_format(exe_instr_format),
 
         .i_alu_result(exe_alu_result),
-        .i_jump_instr_addr(exe_jump_instr_addr),
         .i_pc_immed(exe_pc_immed),
-        .i_branch_sel(exe_branch_sel),
+        .i_next_instr_addr(exe_next_instr_addr),
 
         .o_instr(mem_instr),
         .o_imem_raddr(mem_imem_raddr),
@@ -387,9 +387,8 @@ module hart #(
         .o_instr_format(mem_instr_format),
 
         .o_alu_result(mem_alu_result),
-        .o_jump_instr_addr(mem_jump_instr_addr),
         .o_pc_immed(mem_pc_immed),
-        .o_branch_sel(mem_branch_sel)
+        .o_next_instr_addr(mem_next_instr_addr)
     );
 
 
@@ -428,8 +427,7 @@ module hart #(
     wire [5:0]  wr_instr_format;
 
     // Execution Stage Items
-    wire [31:0]     wr_alu_result, wr_pc_immed;
-    wire            wr_branch_sel;
+    wire [31:0]     wr_alu_result, wr_pc_immed, wr_next_instr_addr;
 
     // Memory Stage Items
     wire [31:0] wr_dmem_out;
@@ -452,9 +450,8 @@ module hart #(
         .i_instr_format(mem_instr_format),
 
         .i_alu_result(mem_alu_result),
-        .i_jump_instr_addr(mem_jump_instr_addr),
         .i_pc_immed(mem_pc_immed),
-        .i_branch_sel(mem_branch_sel),
+        .i_next_instr_addr(mem_next_instr_addr),
 
         .i_dmem_out(mem_dmem_out),
 
@@ -474,16 +471,14 @@ module hart #(
         .o_instr_format(wr_instr_format),
 
         .o_alu_result(wr_alu_result),
-        .o_jump_instr_addr(wr_jump_instr_addr),
         .o_pc_immed(wr_pc_immed),
-        .o_branch_sel(wr_branch_sel),
+        .o_next_instr_addr(wr_next_instr_addr),
 
         .o_dmem_out(wr_dmem_out)
     );
     
 
     // Write Back Phase
-    wire [31:0] wr_next_instr_addr;
     wrBack writeBack(
         .i_clk(i_clk),
         .i_rst(i_rst),

@@ -22,6 +22,7 @@ module exe(
     input wire [31:0]   i_immed,
     input wire [31:0]   i_instr,
     input wire [31:0]   i_pc,
+    input wire [31:0]   i_pc_plus_4,
 
     // OutPut Data
     output wire [31:0]  o_alu_result,
@@ -29,7 +30,8 @@ module exe(
 
     // PC Ouput
     output wire [31:0]  o_jump_addr,
-    output wire         o_branch_sel
+    output wire         o_jump_sel,
+    output wire [31:0]  o_next_instr_addr
 );
     // Select Alu Input
     wire [31:0] alu_input_1 =   i_reg_rs1_data;
@@ -64,19 +66,23 @@ module exe(
         .gen_out()
     );
 
+    // Connect PC Jump Address
+    assign o_jump_addr =    i_jump_type_sel ? {o_alu_result[31:1], 1'b0} : o_pc_immed;
+
     // Connect Branch Control
     b_cntr branchControl(
         .i_jump(i_jump_sel),
         .i_funct3(i_funct3),
+        .i_jump_addr(o_jump_addr),
 
         .i_eq(equal),
         .i_slt(less_than),
 
-        .o_jump_cntr(o_branch_sel)
+        .o_jump_cntr(o_jump_sel),
+        .o_next_instr_addr(o_next_instr_addr)
     );
 
-    // Connect PC Jump Address
-    assign o_jump_addr =        i_jump_type_sel ? {o_alu_result[31:1], 1'b0} : o_pc_immed;
+    
 endmodule
 
 `default_nettype wire
