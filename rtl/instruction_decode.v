@@ -6,6 +6,12 @@ module instrDecode(
 
     input wire [31:0]   i_instr,
     input wire [31:0]   i_reg_wr_data,
+    input wire          i_reg_wr_en,
+
+    input wire          i_exe_wr_en,
+    input wire [4:0]    i_exe_wr_addr,
+    input wire          i_mem_wr_en,
+    input wire [4:0]    i_mem_wr_addr,
     
     // Data Signals
     output wire [4:0]   o_reg_addr_wr,
@@ -30,9 +36,11 @@ module instrDecode(
     output wire         o_dmem_rd_en,
     // Write Back Control
     output wire [2:0]   o_reg_wr_sel,
+    output wire         o_reg_wr_en,
     // HALT CONTROL SIGNAL
     output wire         o_halt,
     output wire         o_trap,
+    output wire         o_stall,
     
     // Output function signals
     output wire [2:0]   o_funct3,
@@ -49,37 +57,6 @@ module instrDecode(
     assign opcode =         i_instr[6:0];
     assign o_funct3 =       i_instr[14:12];
     assign o_funct7 =       i_instr[31:25];
-
-    // Connect control Unit
-    wire [5:0] instr_format;
-    wire reg_wr_en;
-    cntrUnit controlUnit(
-        .i_clk(i_clk),
-        .i_rst(i_rst),
-
-        .i_opcode(opcode),
-        .i_funct3(o_funct3),
-        .i_funct7(o_funct7),
-
-        .o_format(instr_format),
-        .o_alu_input_sel(o_alu_input_sel),
-        .o_alu_op_sel(o_alu_op_sel),
-        .o_alu_sub_sel(o_alu_sub_sel),
-        .o_alu_sign_sel(o_alu_sign_sel),
-        .o_alu_arith_sel(o_alu_arith_sel),
-
-        .o_jump_type_sel(o_jump_type_sel), 
-        .o_jump_sel(o_jump_sel),        
-    
-        .o_dmem_wr_en(o_dmem_wr_en),
-        .o_dmem_rd_en(o_dmem_rd_en),
-        
-        .o_reg_wr_sel(o_reg_wr_sel),
-        .o_reg_wr_en(reg_wr_en),
-
-        .o_halt(o_halt),
-        .o_trap(o_trap)
-    );
 
     // Connect Register File
     wire [4:0] rs1_addr;
@@ -101,10 +78,51 @@ module instrDecode(
         .i_rs2_raddr(rs2_addr),
         .o_rs2_rdata(o_reg_data_2),
 
-        .i_rd_wen(reg_wr_en),
+        .i_rd_wen(i_reg_wr_en),
         .i_rd_waddr(rd_addr),
         .i_rd_wdata(i_reg_wr_data)
     );
+
+    // Connect control Unit
+    wire [5:0] instr_format;
+    cntrUnit controlUnit(
+        .i_clk(i_clk),
+        .i_rst(i_rst),
+
+        .i_opcode(opcode),
+        .i_funct3(o_funct3),
+        .i_funct7(o_funct7),
+        .i_rs1_addr(rs1_addr),
+        .i_rs2_addr(rs2_addr),
+
+        .i_exe_wr_en(i_exe_wr_en).
+        .i_exe_rd_addr(i_exe_wr_addr),
+        .i_mem_wr_en(i_mem_wr_en).
+        .i_mem_rd_addr(i_mem_wr_addr),
+
+        .o_format(instr_format),
+        .o_alu_input_sel(o_alu_input_sel),
+        .o_alu_op_sel(o_alu_op_sel),
+        .o_alu_sub_sel(o_alu_sub_sel),
+        .o_alu_sign_sel(o_alu_sign_sel),
+        .o_alu_arith_sel(o_alu_arith_sel),
+
+        .o_jump_type_sel(o_jump_type_sel), 
+        .o_jump_sel(o_jump_sel),        
+    
+        .o_dmem_wr_en(o_dmem_wr_en),
+        .o_dmem_rd_en(o_dmem_rd_en),
+        
+        .o_reg_wr_sel(o_reg_wr_sel),
+        .o_reg_wr_en(o_reg_wr_en),
+
+        .o_halt(o_halt),
+        .o_trap(o_trap)
+
+        .o_stall(o_stall)
+    );
+
+    
 
     // Connect Immediate Generator
     imm immediateGenerator(

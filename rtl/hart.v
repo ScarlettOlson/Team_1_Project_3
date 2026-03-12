@@ -136,6 +136,7 @@ module hart #(
     wire [31:0] if_instr;
     wire [31:0] if_pc;
     wire [31:0] if_pc_plus_4;
+    wire        id_stall
     wire [31:0] exe_jump_instr_addr;
     wire        exe_jump_sel;
     instrFetch instructionFetch(
@@ -145,6 +146,7 @@ module hart #(
         .i_imem_rdata(i_imem_rdata),
 
         .i_next_instr_addr(if_pc_plus_4),
+        .i_stall(id_stall)
         .i_jump_instr_addr(exe_jump_instr_addr),
         .i_jump_sel(exe_jump_sel),
 
@@ -212,6 +214,7 @@ module hart #(
         .o_reg_wr_sel(id_reg_wr_sel),
         .o_halt(id_halt_signal),
         .o_trap(id_trap_signal),
+        .o_stall(id_stall),
 
         .o_funct3(id_funct3),
         .o_funct7(id_funct7),
@@ -231,7 +234,7 @@ module hart #(
     wire        exe_jump_type_sel;  // Jump Control Signal
     wire        exe_dmem_wr_en, exe_dmem_rd_en;   // Dmem Control Signals
     wire [2:0]  exe_reg_wr_sel;                  // Write Back Control Signal
-    wire        exe_halt_signal, exe_trap_signal; // Instruction Control Signals
+    wire        exe_halt_signal, exe_trap_signal, exe_stall; // Instruction Control Signals
     wire [2:0]  exe_funct3;                      // Function Codes and Format
     wire [6:0]  exe_funct7;
     wire [5:0]  exe_instr_format;
@@ -262,6 +265,7 @@ module hart #(
         .i_reg_wr_sel(id_reg_wr_sel),
         .i_halt_signal(id_halt_signal),
         .i_trap_signal(id_trap_signal),
+        .i_stall(id_stall),
         .i_funct3(id_funct3),
         .i_funct7(id_funct7),
         .i_instr_format(id_instr_format),
@@ -289,6 +293,7 @@ module hart #(
         .o_reg_wr_sel(exe_reg_wr_sel),
         .o_halt_signal(exe_halt_signal),
         .o_trap_signal(exe_trap_signal),
+        .o_stall(exe_stall),
         .o_funct3(exe_funct3),
         .o_funct7(exe_funct7),
         .o_instr_format(exe_instr_format)
@@ -299,6 +304,7 @@ module hart #(
     exe execution(
         .i_clk(i_clk),
         .i_rst(i_rst),
+        .i_stall(exe_stall),
 
         .i_alu_input_sel(exe_alu_input_sel),
         .i_alu_op_sel(exe_alu_op_sel),
@@ -336,7 +342,7 @@ module hart #(
     wire        mem_jump_type_sel;  // Jump Control Signal
     wire        mem_dmem_wr_en, mem_dmem_rd_en;   // Dmem Control Signals
     wire [2:0]  mem_reg_wr_sel;                  // Write Back Control Signal
-    wire        mem_halt_signal, mem_trap_signal; // Instruction Control Signals
+    wire        mem_halt_signal, mem_trap_signal, mem_stall; // Instruction Control Signals
     wire [2:0]  mem_funct3;                      // Function Codes and Format
     wire [6:0]  mem_funct7;
     wire [5:0]  mem_instr_format;
@@ -361,6 +367,7 @@ module hart #(
         .i_reg_wr_sel(exe_reg_wr_sel),
         .i_halt_signal(exe_halt_signal),
         .i_trap_signal(exe_trap_signal),
+        .i_stall(exe_stall),
         .i_funct3(exe_funct3),
         .i_instr_format(exe_instr_format),
 
@@ -383,6 +390,7 @@ module hart #(
         .o_reg_wr_sel(mem_reg_wr_sel),
         .o_halt_signal(mem_halt_signal),
         .o_trap_signal(mem_trap_signal),
+        .o_stall(mem_stall),
         .o_funct3(mem_funct3),
         .o_instr_format(mem_instr_format),
 
@@ -397,6 +405,7 @@ module hart #(
     mem memory(
         .i_clk(i_clk),
         .i_rst(i_rst),
+        .i_stall(mem_stall),
 
         .o_dmem_addr(o_dmem_addr),
         .o_dmem_ren(o_dmem_ren),
@@ -423,7 +432,7 @@ module hart #(
     wire [4:0]  wr_reg_rd_addr,  wr_reg_rs1_addr, wr_reg_rs2_addr;  // Addresses
     wire [31:0] wr_reg_rs1_data, wr_reg_rs2_data, wr_immed;         // Values
     wire [2:0]  wr_reg_wr_sel;                  // Write Back Control Signal
-    wire        wr_halt_signal, wr_trap_signal; // Instruction Control Signals
+    wire        wr_halt_signal, wr_trap_signal, wr_stall; // Instruction Control Signals
     wire [5:0]  wr_instr_format;
 
     // Execution Stage Items
@@ -447,6 +456,7 @@ module hart #(
         .i_reg_wr_sel(mem_reg_wr_sel),
         .i_halt_signal(mem_halt_signal),
         .i_trap_signal(mem_trap_signal),
+        .i_stall(mem_stall),
         .i_instr_format(mem_instr_format),
 
         .i_alu_result(mem_alu_result),
@@ -468,6 +478,7 @@ module hart #(
         .o_reg_wr_sel(wr_reg_wr_sel),
         .o_halt_signal(wr_halt_signal),
         .o_trap_signal(wr_trap_signal),
+        .o_stall(wr_stall),
         .o_instr_format(wr_instr_format),
 
         .o_alu_result(wr_alu_result),
@@ -482,6 +493,7 @@ module hart #(
     wrBack writeBack(
         .i_clk(i_clk),
         .i_rst(i_rst),
+        .i_stall(wr_stall),
 
         .i_reg_wr_sel(wr_reg_wr_sel),
 
@@ -495,19 +507,22 @@ module hart #(
     );
 
     // Set all Retire signals at the end of the cycle.
-    assign o_retire_valid = 1'b1;
-    assign o_retire_inst = wr_instr;
-    assign o_retire_trap = wr_trap_signal;
-    assign o_retire_halt = wr_halt_signal;
-    assign o_retire_rd_wdata = wr_reg_wr_data;
-    assign o_retire_pc = wr_pc;
-    assign o_retire_next_pc = wr_next_instr_addr;
-    assign o_retire_rd_waddr = (wr_instr_format[0] | wr_instr_format[1] | wr_instr_format[4] | wr_instr_format[5]) ? wr_reg_rd_addr : 5'b00000;        // Set to zero if memory write is not enable
-    assign o_retire_rd_wdata = (wr_instr_format[0] | wr_instr_format[1] | wr_instr_format[4] | wr_instr_format[5]) ? wr_reg_wr_data : 32'h00000000;    // Set to zero if memory read is not enable
-    assign o_retire_rs1_raddr = wr_reg_rs1_addr;
-    assign o_retire_rs2_raddr = wr_reg_rs2_addr;
-    assign o_retire_rs1_rdata = wr_reg_rs1_data;
-    assign o_retire_rs2_rdata = wr_reg_rs2_data;
+    wire rd_wr;
+    assign rd_wr = wr_instr_format[0] | wr_instr_format[1] | wr_instr_format[4] | wr_instr_format[5];
+    
+    assign o_retire_valid       = !wr_stall             ? 1'b1                  : 1'b0;
+    assign o_retire_inst        = !wr_stall             ? wr_instr              : 32'h0000_0000;
+    assign o_retire_trap        = !wr_stall             ? wr_trap_signal        : 1'b0;
+    assign o_retire_halt        = !wr_stall             ? wr_halt_signal        : 1'b0;
+    assign o_retire_rd_wdata    = !wr_stall             ? wr_reg_wr_data        : 32'h0000_0000;
+    assign o_retire_pc          = !wr_stall             ? wr_pc                 : 32'h0000_0000;
+    assign o_retire_next_pc     = !wr_stall             ? wr_next_instr_addr    : 32'h0000_0000;
+    assign o_retire_rd_waddr    = (!wr_stall & rd_wr)   ? wr_reg_rd_addr        : 5'b00000;        
+    assign o_retire_rd_wdata    = (!wr_stall & rd_wr)   ? wr_reg_wr_data        : 32'h0000_0000;
+    assign o_retire_rs1_raddr   = !wr_stall             ? wr_reg_rs1_addr       : 5'b00000;
+    assign o_retire_rs2_raddr   = !wr_stall             ? wr_reg_rs2_addr       : 5'b00000;
+    assign o_retire_rs1_rdata   = !wr_stall             ? wr_reg_rs1_data       : 32'h00000000;
+    assign o_retire_rs2_rdata   = !wr_stall             ? wr_reg_rs2_data       : 32'h00000000;
 
 
 endmodule
