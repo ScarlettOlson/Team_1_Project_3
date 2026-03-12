@@ -273,7 +273,7 @@ module hart #(
         .i_alu_result(alu_result),
         .i_reg_rs2_data(reg_rs2_data),
 
-        .o_dmem_shifted_data(shifted_mem_data)
+        .o_dmem_rdata(shifted_mem_data)
     );
 
     // Write Back Phase

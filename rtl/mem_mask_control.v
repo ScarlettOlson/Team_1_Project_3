@@ -7,6 +7,7 @@ module memCntr(
 
     output wire [3:0]  o_dmem_mask
 );
+    wire is_byte, is_half, is_word;
     assign is_byte = !i_funct3[0] & !i_funct3[1];
     assign is_half = i_funct3[0];
     assign is_word = i_funct3[1];

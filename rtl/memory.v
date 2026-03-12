@@ -36,22 +36,32 @@ module mem(
     );
     assign o_dmem_mask =    mask;
 
+    // Shift Write Data
+    shifter memoryWriteShifter(
+        .val(i_reg_rs2_data),
+        .shamt({i_alu_result[1:0], 3'b000}),
+        .shift_right(1'b0),
+        .shift_arith(1'b0),
+        .shifted_val(o_dmem_wdata)
+    );
+
     // Connect Memory Module Pass Through
     assign o_dmem_ren =     i_dmem_rd_en;
     assign o_dmem_wen =     i_dmem_wr_en;
     assign o_dmem_addr =    {i_alu_result[31:2], 2'b00};
-    assign o_dmem_wdata =   i_reg_rs2_data;
     
     // Load Shifter
     wire [31:0] dmem_shifted_data;
-    shifter memoryOutputShifter(
+    shifter memoryLoadShifter(
         .val(i_dmem_rdata),
-        .shamt(I_alu_result[1:0]),
+        .shamt({i_alu_result[1:0], 3'b000}),
         .shift_right(1'b1),
         .shift_arith(i_funct3[2]),
         .shifted_val(dmem_shifted_data)
     );
+
     // Determine Load Type
+    wire sign_byte, sign_half, word, zero_byte, zero_half;
     assign sign_byte =  i_dmem_rd_en & i_funct3 == 3'b000;
     assign sign_half =  i_dmem_rd_en & i_funct3 == 3'b001;
     assign word =       i_dmem_rd_en & i_funct3 == 3'b010;

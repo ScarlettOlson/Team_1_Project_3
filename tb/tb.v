@@ -80,6 +80,11 @@ module hart_tb ();
     initial begin
         clk = 0;
 
+        // Waveform dump
+        $dumpfile("hart.vcd");
+        $dumpvars(0, hart_tb);
+
+
         // Load the test program into memory at address 0.
         $display("Loading program.");
         $readmemh("program.mem", imem);
