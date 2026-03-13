@@ -73,6 +73,7 @@ module exe(
     b_cntr branchControl(
         .i_jump(i_jump_sel),
         .i_funct3(i_funct3),
+        .i_pc_plus_4(i_pc_plus_4),
         .i_jump_addr(o_jump_addr),
 
         .i_eq(equal),

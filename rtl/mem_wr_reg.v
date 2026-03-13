@@ -28,6 +28,12 @@ module mem_wr_reg (
     input wire [31:0]   i_next_instr_addr,
 
     // From Mem Stage
+    input wire [31:0]   i_dmem_addr,
+    input wire          i_dmem_ren,
+    input wire          i_dmem_wen,
+    input wire [3:0]    i_dmem_mask,
+    input wire [31:0]   i_dmem_wdata,
+    input wire [31:0]   i_dmem_rdata,
     input wire [31:0]   i_dmem_out,
 
     // Outputs
@@ -52,6 +58,13 @@ module mem_wr_reg (
     output wire [31:0]  o_pc_immed,
     output wire [31:0]  o_next_instr_addr,
 
+    // From Mem Stage
+    output wire [31:0]  o_dmem_addr,
+    output wire         o_dmem_ren,
+    output wire         o_dmem_wen,
+    output wire [3:0]   o_dmem_mask,
+    output wire [31:0]  o_dmem_wdata,
+    output wire [31:0]  o_dmem_rdata,
     output wire [31:0]  o_dmem_out
 );
 
@@ -66,31 +79,42 @@ module mem_wr_reg (
 
     reg [31:0] alu_result, pc_immed, next_instr_addr;
 
-    reg [31:0]   dmem_out;
+    reg [31:0] dmem_addr;
+    reg        dmem_ren, dmem_wen;
+    reg [3:0]  dmem_mask;
+    reg [31:0] dmem_wdata;
+    reg [31:0] dmem_rdata;
+    reg [31:0] dmem_out;
 
     always @(posedge i_clk) begin
-        instr           <=    i_instr;
-        imem_raddr      <=    i_imem_raddr;
-        pc              <=    i_pc;
+        instr           <=  i_instr;
+        imem_raddr      <=  i_imem_raddr;
+        pc              <=  i_pc;
 
-        reg_rd_addr     <=    i_reg_rd_addr;
-        reg_rs1_addr    <=    i_reg_rs1_addr;
-        reg_rs2_addr    <=    i_reg_rs2_addr;
-        reg_rs1_data    <=    i_reg_rs1_data;
-        reg_rs2_data    <=    i_reg_rs2_data;
-        immed           <=    i_immed;
-        reg_wr_sel      <=    i_reg_wr_sel;
-        reg_wr_en       <=    i_reg_wr_en;
-        halt_signal     <=    i_halt_signal;
-        trap_signal     <=    i_trap_signal;
-        stall           <=    i_stall;
-        instr_format    <=    i_instr_format;
+        reg_rd_addr     <=  i_reg_rd_addr;
+        reg_rs1_addr    <=  i_reg_rs1_addr;
+        reg_rs2_addr    <=  i_reg_rs2_addr;
+        reg_rs1_data    <=  i_reg_rs1_data;
+        reg_rs2_data    <=  i_reg_rs2_data;
+        immed           <=  i_immed;
+        reg_wr_sel      <=  i_reg_wr_sel;
+        reg_wr_en       <=  i_reg_wr_en;
+        halt_signal     <=  i_halt_signal;
+        trap_signal     <=  i_trap_signal;
+        stall           <=  i_stall;
+        instr_format    <=  i_instr_format;
 
-        alu_result      <=    i_alu_result;
-        pc_immed        <=    i_pc_immed;
+        alu_result      <=  i_alu_result;
+        pc_immed        <=  i_pc_immed;
         next_instr_addr <=  i_next_instr_addr;
 
-        dmem_out        <=    i_dmem_out;
+        dmem_addr       <=  i_dmem_addr;
+        dmem_ren        <=  i_dmem_ren;
+        dmem_wen        <=  i_dmem_wen;
+        dmem_mask       <=  i_dmem_mask;
+        dmem_wdata      <=  i_dmem_wdata;
+        dmem_rdata      <=  i_dmem_rdata;
+        dmem_out        <=  i_dmem_out;
     end
 
     // Outputs
@@ -115,6 +139,12 @@ module mem_wr_reg (
     assign o_pc_immed           = pc_immed;
     assign o_next_instr_addr    = next_instr_addr;
 
+    assign o_dmem_addr          = dmem_addr;
+    assign o_dmem_ren           = dmem_ren;
+    assign o_dmem_wen           = dmem_wen;
+    assign o_dmem_mask          = dmem_mask;
+    assign o_dmem_wdata         = dmem_wdata;
+    assign o_dmem_rdata         = dmem_rdata;
     assign o_dmem_out           = dmem_out;
 endmodule
 
