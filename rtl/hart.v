@@ -136,17 +136,18 @@ module hart #(
     wire [31:0] if_instr;
     wire [31:0] if_pc;
     wire [31:0] if_pc_plus_4;
-    wire        id_stall
+    wire        id_stall;
     wire [31:0] exe_jump_instr_addr;
     wire        exe_jump_sel;
     instrFetch instructionFetch(
         .i_clk(i_clk),
+        .i_rst(i_rst),
+        .i_stall(id_stall),
 
         .o_imem_raddr(o_imem_raddr),
         .i_imem_rdata(i_imem_rdata),
 
         .i_next_instr_addr(if_pc_plus_4),
-        .i_stall(id_stall)
         .i_jump_instr_addr(exe_jump_instr_addr),
         .i_jump_sel(exe_jump_sel),
 
@@ -180,6 +181,12 @@ module hart #(
     wire        id_jump_type_sel, id_jump_sel;  // Jump Control Signal
     wire        id_dmem_wr_en, id_dmem_rd_en;   // Dmem Control Signals
     wire [2:0]  id_reg_wr_sel;                  // Write Back Control Signal
+    wire        id_reg_wr_en;
+    wire        exe_reg_wr_en;
+    wire [4:0]  exe_reg_rd_addr;
+    wire        mem_reg_wr_en;
+    wire [4:0]  mem_reg_rd_addr;
+    wire        wr_reg_wr_en;
     wire        id_halt_signal, id_trap_signal; // Instruction Control Signals
     wire [2:0]  id_funct3;                      // Function Codes and Format
     wire [6:0]  id_funct7;
@@ -191,6 +198,12 @@ module hart #(
 
         .i_instr(id_instr),
         .i_reg_wr_data(wr_reg_wr_data),
+        .i_reg_wr_en(wr_reg_wr_en),
+
+        .i_exe_wr_en(exe_reg_wr_en),
+        .i_exe_wr_addr(exe_reg_rd_addr),
+        .i_mem_wr_en(mem_reg_wr_en),
+        .i_mem_wr_addr(mem_reg_rd_addr),
 
         .o_reg_addr_wr(id_reg_rd_addr),
         .o_reg_addr_1(id_reg_rs1_addr),
@@ -212,6 +225,7 @@ module hart #(
         .o_dmem_rd_en(id_dmem_rd_en),
 
         .o_reg_wr_sel(id_reg_wr_sel),
+        .o_reg_wr_en(id_reg_wr_en),
         .o_halt(id_halt_signal),
         .o_trap(id_trap_signal),
         .o_stall(id_stall),
@@ -227,7 +241,7 @@ module hart #(
     wire [31:0] exe_instr, exe_imem_raddr, exe_pc, exe_pc_plus_4;
 
     // ID Stage Items
-    wire [4:0]  exe_reg_rd_addr,  exe_reg_rs1_addr, exe_reg_rs2_addr;  // Addresses
+    wire [4:0]    exe_reg_rs1_addr, exe_reg_rs2_addr;  // Addresses
     wire [31:0] exe_reg_rs1_data, exe_reg_rs2_data, exe_immed;         // Values
     wire [2:0]  exe_alu_op_sel;                  // ALU Control Signals                                
     wire        exe_alu_input_sel, exe_alu_sub_sel, exe_alu_sign_sel, exe_alu_arith_sel;
@@ -263,6 +277,7 @@ module hart #(
         .i_dmem_wr_en(id_dmem_wr_en),
         .i_dmem_rd_en(id_dmem_rd_en),
         .i_reg_wr_sel(id_reg_wr_sel),
+        .i_reg_wr_en(id_reg_wr_en),
         .i_halt_signal(id_halt_signal),
         .i_trap_signal(id_trap_signal),
         .i_stall(id_stall),
@@ -291,6 +306,7 @@ module hart #(
         .o_dmem_wr_en(exe_dmem_wr_en),
         .o_dmem_rd_en(exe_dmem_rd_en),
         .o_reg_wr_sel(exe_reg_wr_sel),
+        .o_reg_wr_en(exe_reg_wr_en),
         .o_halt_signal(exe_halt_signal),
         .o_trap_signal(exe_trap_signal),
         .o_stall(exe_stall),
@@ -304,7 +320,6 @@ module hart #(
     exe execution(
         .i_clk(i_clk),
         .i_rst(i_rst),
-        .i_stall(exe_stall),
 
         .i_alu_input_sel(exe_alu_input_sel),
         .i_alu_op_sel(exe_alu_op_sel),
@@ -335,7 +350,7 @@ module hart #(
     wire [31:0] mem_instr, mem_imem_raddr, mem_pc, mem_pc_plus_4;
 
     // ID Stage Items
-    wire [4:0]  mem_reg_rd_addr,  mem_reg_rs1_addr, mem_reg_rs2_addr;  // Addresses
+    wire [4:0]  mem_reg_rs1_addr, mem_reg_rs2_addr;  // Addresses
     wire [31:0] mem_reg_rs1_data, mem_reg_rs2_data, mem_immed;         // Values
     wire [2:0]  mem_alu_op_sel;                  // ALU Control Signals                                
     wire        mem_alu_input_sel, mem_alu_sub_sel, mem_alu_sign_sel, mem_alu_arith_sel;
@@ -365,6 +380,7 @@ module hart #(
         .i_dmem_wr_en(exe_dmem_wr_en),
         .i_dmem_rd_en(exe_dmem_rd_en),
         .i_reg_wr_sel(exe_reg_wr_sel),
+        .i_reg_wr_en(exe_reg_wr_en),
         .i_halt_signal(exe_halt_signal),
         .i_trap_signal(exe_trap_signal),
         .i_stall(exe_stall),
@@ -388,6 +404,7 @@ module hart #(
         .o_dmem_wr_en(mem_dmem_wr_en),
         .o_dmem_rd_en(mem_dmem_rd_en),
         .o_reg_wr_sel(mem_reg_wr_sel),
+        .o_reg_wr_en(mem_reg_wr_en),
         .o_halt_signal(mem_halt_signal),
         .o_trap_signal(mem_trap_signal),
         .o_stall(mem_stall),
@@ -454,6 +471,7 @@ module hart #(
         .i_reg_rs2_data(mem_reg_rs2_data),
         .i_immed(mem_immed),
         .i_reg_wr_sel(mem_reg_wr_sel),
+        .i_reg_wr_en(mem_reg_wr_en),
         .i_halt_signal(mem_halt_signal),
         .i_trap_signal(mem_trap_signal),
         .i_stall(mem_stall),
@@ -476,6 +494,7 @@ module hart #(
         .o_reg_rs2_data(wr_reg_rs2_data),
         .o_immed(wr_immed),
         .o_reg_wr_sel(wr_reg_wr_sel),
+        .o_reg_wr_en(wr_reg_wr_en),
         .o_halt_signal(wr_halt_signal),
         .o_trap_signal(wr_trap_signal),
         .o_stall(wr_stall),
@@ -493,7 +512,6 @@ module hart #(
     wrBack writeBack(
         .i_clk(i_clk),
         .i_rst(i_rst),
-        .i_stall(wr_stall),
 
         .i_reg_wr_sel(wr_reg_wr_sel),
 

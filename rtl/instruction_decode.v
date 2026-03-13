@@ -95,10 +95,10 @@ module instrDecode(
         .i_rs1_addr(rs1_addr),
         .i_rs2_addr(rs2_addr),
 
-        .i_exe_wr_en(i_exe_wr_en).
-        .i_exe_rd_addr(i_exe_wr_addr),
-        .i_mem_wr_en(i_mem_wr_en).
-        .i_mem_rd_addr(i_mem_wr_addr),
+        .i_exe_wr_en(i_exe_wr_en),
+        .i_exe_wr_addr(i_exe_wr_addr),
+        .i_mem_wr_en(i_mem_wr_en),
+        .i_mem_wr_addr(i_mem_wr_addr),
 
         .o_format(instr_format),
         .o_alu_input_sel(o_alu_input_sel),
@@ -117,7 +117,7 @@ module instrDecode(
         .o_reg_wr_en(o_reg_wr_en),
 
         .o_halt(o_halt),
-        .o_trap(o_trap)
+        .o_trap(o_trap),
 
         .o_stall(o_stall)
     );

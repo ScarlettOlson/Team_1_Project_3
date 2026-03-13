@@ -3,10 +3,9 @@
 module pc #(
     parameter RESET_ADDR = 32'h00000000
 ) (
-    // Global clock.
-    input  wire        i_clk,
-    // Synchronous active-high reset.
-    input  wire        i_rst,
+    input wire          i_clk,
+    input wire          i_rst,
+    input wire          i_stall,
 
 
     input wire [31:0] i_next,
@@ -18,7 +17,7 @@ module pc #(
         if(i_rst) begin
             register <= RESET_ADDR;
         end
-        else begin
+        else if(!i_stall)begin
           register <= i_next;
         end
     end

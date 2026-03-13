@@ -3,6 +3,7 @@
 module instrFetch(
     input wire          i_clk,
     input wire          i_rst,
+    input wire          i_stall,
 
     // Pass through connects module to the provided instruction memory
     output wire [31:0]  o_imem_raddr,
@@ -24,6 +25,7 @@ module instrFetch(
     pc programCounter(
         .i_clk(i_clk),
         .i_rst(i_rst),
+        .i_stall(i_stall),
         .i_next(next_instr),
         .o_current(instr_addr)
     );

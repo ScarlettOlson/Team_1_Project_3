@@ -3,6 +3,7 @@
 module mem(
     input wire          i_clk,
     input wire          i_rst,
+    input wire          i_stall,
 
     // Memory Connection Pass Through
     output wire [31:0]  o_dmem_addr,
@@ -46,8 +47,8 @@ module mem(
     );
 
     // Connect Memory Module Pass Through
-    assign o_dmem_ren =     i_dmem_rd_en;
-    assign o_dmem_wen =     i_dmem_wr_en;
+    assign o_dmem_ren =     i_dmem_rd_en & !i_stall;
+    assign o_dmem_wen =     i_dmem_wr_en & !i_stall;
     assign o_dmem_addr =    {i_alu_result[31:2], 2'b00};
     
     // Load Shifter

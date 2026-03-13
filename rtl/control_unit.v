@@ -8,13 +8,13 @@ module cntrUnit(
     input wire [6:0]    i_opcode,
     input wire [2:0]    i_funct3,
     input wire [6:0]    i_funct7,
-    input wire [31:0]   i_rs1_addr,
-    input wire [31:0]   i_rs2_addr,
+    input wire [4:0]   i_rs1_addr,
+    input wire [4:0]   i_rs2_addr,
 
-    input wire          i_exe_rd_en,
-    input wire [31:0]   i_exe_rd_addr,
-    input wire          i_mem_rd_en,
-    input wire [31:0]   i_mem_rd_addr,
+    input wire          i_exe_wr_en,
+    input wire [4:0]   i_exe_wr_addr,
+    input wire          i_mem_wr_en,
+    input wire [4:0]   i_mem_wr_addr,
 
     // CONTROL SIGNALS
     // Instruction Format
@@ -92,8 +92,8 @@ module cntrUnit(
     assign pc_change_instr = is_branch_instr | is_jump_instr | is_jump_link_instr;
     wire exe_wr_to_rd;
     wire mem_wr_to_rd;
-    assign exe_wr_to_rd = i_exe_rd_en & ((i_exe_rd_addr == i_rs1_addr) | (i_exe_rd_addr == i_rs2_addr));
-    assign mem_wr_to_rd = i_mem_rd_en & ((i_mem_rd_addr == i_rs1_addr) | (i_mem_rd_addr == i_rs2_addr));
+    assign exe_wr_to_rd = i_exe_wr_en & ((i_exe_wr_addr == i_rs1_addr) | (i_exe_wr_addr == i_rs2_addr));
+    assign mem_wr_to_rd = i_mem_wr_en & ((i_mem_wr_addr == i_rs1_addr) | (i_mem_wr_addr == i_rs2_addr));
     assign o_stall =  pc_change_instr | (!pc_change_instr &  (exe_wr_to_rd | mem_wr_to_rd));
 
 endmodule

@@ -1,55 +1,59 @@
 `default_nettype none
 
 module exe_mem_reg (
-    input wire        i_clk,
+    input wire          i_clk,
 
     // From IF Stage
-    input wire [31:0] i_instr,
-    input wire [31:0] i_imem_raddr,
-    input wire [31:0] i_pc,
+    input wire [31:0]   i_instr,
+    input wire [31:0]   i_imem_raddr,
+    input wire [31:0]   i_pc,
 
     // From ID Stage
-    input wire [4:0]  i_reg_rd_addr,
-    input wire [4:0]  i_reg_rs1_addr,
-    input wire [4:0]  i_reg_rs2_addr,
-    input wire [31:0] i_reg_rs1_data,
-    input wire [31:0] i_reg_rs2_data,
-    input wire [31:0] i_immed,
-    input wire        i_dmem_wr_en,
-    input wire        i_dmem_rd_en,
-    input wire [2:0]  i_reg_wr_sel,
-    input wire        i_halt_signal,
-    input wire        i_trap_signal,
-    input wire [2:0]  i_funct3,
-    input wire [5:0]  i_instr_format,
+    input wire [4:0]    i_reg_rd_addr,
+    input wire [4:0]    i_reg_rs1_addr,
+    input wire [4:0]    i_reg_rs2_addr,
+    input wire [31:0]   i_reg_rs1_data,
+    input wire [31:0]   i_reg_rs2_data,
+    input wire [31:0]   i_immed,
+    input wire          i_dmem_wr_en,
+    input wire          i_dmem_rd_en,
+    input wire [2:0]    i_reg_wr_sel,
+    input wire          i_reg_wr_en,
+    input wire          i_halt_signal,
+    input wire          i_trap_signal,
+    input wire          i_stall,
+    input wire [2:0]    i_funct3,
+    input wire [5:0]    i_instr_format,
 
     // From EXE Stage
-    input wire [31:0] i_alu_result,
-    input wire [31:0] i_pc_immed,
-    input wire [31:0] i_next_instr_addr,
+    input wire [31:0]   i_alu_result,
+    input wire [31:0]   i_pc_immed,
+    input wire [31:0]   i_next_instr_addr,
 
     // Outputs
-    output wire [31:0] o_instr,
-    output wire [31:0] o_imem_raddr,
-    output wire [31:0] o_pc,
+    output wire [31:0]  o_instr,
+    output wire [31:0]  o_imem_raddr,
+    output wire [31:0]  o_pc,
 
-    output wire [4:0]  o_reg_rd_addr,
-    output wire [4:0]  o_reg_rs1_addr,
-    output wire [4:0]  o_reg_rs2_addr,
-    output wire [31:0] o_reg_rs1_data,
-    output wire [31:0] o_reg_rs2_data,
-    output wire [31:0] o_immed,
-    output wire        o_dmem_wr_en,
-    output wire        o_dmem_rd_en,
-    output wire [2:0]  o_reg_wr_sel,
-    output wire        o_halt_signal,
-    output wire        o_trap_signal,
-    output wire [2:0]  o_funct3,
-    output wire [5:0]  o_instr_format,
+    output wire [4:0]   o_reg_rd_addr,
+    output wire [4:0]   o_reg_rs1_addr,
+    output wire [4:0]   o_reg_rs2_addr,
+    output wire [31:0]  o_reg_rs1_data,
+    output wire [31:0]  o_reg_rs2_data,
+    output wire [31:0]  o_immed,
+    output wire         o_dmem_wr_en,
+    output wire         o_dmem_rd_en,
+    output wire [2:0]   o_reg_wr_sel,
+    output wire         o_reg_wr_en,
+    output wire         o_halt_signal,
+    output wire         o_trap_signal,
+    output wire         o_stall,
+    output wire [2:0]   o_funct3,
+    output wire [5:0]   o_instr_format,
 
-    output wire [31:0] o_alu_result,
-    output wire [31:0] o_pc_immed,
-    output wire [31:0] o_next_instr_addr
+    output wire [31:0]  o_alu_result,
+    output wire [31:0]  o_pc_immed,
+    output wire [31:0]  o_next_instr_addr
 );
 
     reg [31:0] instr, imem_raddr, pc;
@@ -59,7 +63,8 @@ module exe_mem_reg (
     reg        jump_type_sel;
     reg        dmem_wr_en, dmem_rd_en;
     reg [2:0]  reg_wr_sel;
-    reg        halt_signal, trap_signal;
+    reg        reg_wr_en;
+    reg        halt_signal, trap_signal, stall;
     reg [2:0]  funct3;
     reg [6:0]  funct7;
     reg [5:0]  instr_format;
@@ -80,8 +85,10 @@ module exe_mem_reg (
         dmem_wr_en      <=    i_dmem_wr_en;
         dmem_rd_en      <=    i_dmem_rd_en;
         reg_wr_sel      <=    i_reg_wr_sel;
+        reg_wr_en       <=    i_reg_wr_en;
         halt_signal     <=    i_halt_signal;
         trap_signal     <=    i_trap_signal;
+        stall           <=    i_stall;
         funct3          <=    i_funct3;
         instr_format    <=    i_instr_format;
 
@@ -104,8 +111,10 @@ module exe_mem_reg (
     assign o_dmem_wr_en         = dmem_wr_en;
     assign o_dmem_rd_en         = dmem_rd_en;
     assign o_reg_wr_sel         = reg_wr_sel;
+    assign o_reg_wr_en          = reg_wr_en;
     assign o_halt_signal        = halt_signal;
     assign o_trap_signal        = trap_signal;
+    assign o_stall              = stall;
     assign o_funct3             = funct3;
     assign o_instr_format       = instr_format;
     
