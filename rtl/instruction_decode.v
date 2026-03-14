@@ -29,8 +29,9 @@ module instrDecode(
     output wire         o_alu_sign_sel,
     output wire         o_alu_arith_sel,
     // PC Select Control
-    output wire         o_jump_type_sel, // Selects between pc+=signextend(immed) and pc = target
-    output wire         o_jump_sel,      // Informs branch controller if the instruction is a jump or branch type
+    output wire         o_jump_addr_sel,
+    output wire         o_jump_sel,
+    output wire         o_branch_sel,
     // Data Memory Control
     output wire         o_dmem_wr_en,
     output wire         o_dmem_rd_en,
@@ -107,8 +108,9 @@ module instrDecode(
         .o_alu_sign_sel(o_alu_sign_sel),
         .o_alu_arith_sel(o_alu_arith_sel),
 
-        .o_jump_type_sel(o_jump_type_sel), 
-        .o_jump_sel(o_jump_sel),        
+        .o_jump_addr_sel(o_jump_addr_sel),
+        .o_jump_sel(o_jump_sel), 
+        .o_branch_sel(o_branch_sel),        
     
         .o_dmem_wr_en(o_dmem_wr_en),
         .o_dmem_rd_en(o_dmem_rd_en),

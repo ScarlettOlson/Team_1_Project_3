@@ -8,13 +8,13 @@ module cntrUnit(
     input wire [6:0]    i_opcode,
     input wire [2:0]    i_funct3,
     input wire [6:0]    i_funct7,
-    input wire [4:0]   i_rs1_addr,
-    input wire [4:0]   i_rs2_addr,
+    input wire [4:0]    i_rs1_addr,
+    input wire [4:0]    i_rs2_addr,
 
     input wire          i_exe_wr_en,
-    input wire [4:0]   i_exe_wr_addr,
+    input wire [4:0]    i_exe_wr_addr,
     input wire          i_mem_wr_en,
-    input wire [4:0]   i_mem_wr_addr,
+    input wire [4:0]    i_mem_wr_addr,
 
     // CONTROL SIGNALS
     // Instruction Format
@@ -26,8 +26,9 @@ module cntrUnit(
     output wire         o_alu_sign_sel,
     output wire         o_alu_arith_sel,
     // PC Select Control
-    output wire         o_jump_type_sel, // Selects between pc+=signextend(immed) and pc = target
-    output wire         o_jump_sel,      // Informs branch controller if the instruction is a jump or branch type
+    output wire         o_jump_addr_sel,     // Is 1 if the jump location is the alu output instead of pc+immed
+    output wire         o_jump_sel,         // Is a Jump Instruction
+    output wire         o_branch_sel,       // Is a branch Instruction
     // Data Memory Contro
     output wire         o_dmem_wr_en,
     output wire         o_dmem_rd_en,
@@ -64,17 +65,18 @@ module cntrUnit(
 
 
     // ALU Control Signals
-    assign o_alu_input_sel =    is_immed_arith_instr | is_mem_load_instr | is_mem_store_instr | is_jump_link_instr;                 // Set when an immed is used
-    assign o_alu_op_sel[0] =    (is_reg_arith_instr | is_immed_arith_instr) ? (i_funct3[0] | (i_funct3 == 3'b010))  : 1'b0;        
-    assign o_alu_op_sel[1] =    (is_reg_arith_instr | is_immed_arith_instr) ? i_funct3[1]                           : 1'b0;
-    assign o_alu_op_sel[2] =    (is_reg_arith_instr | is_immed_arith_instr) ? i_funct3[2]                           : 1'b0;
-    assign o_alu_sub_sel =      ((is_reg_arith_instr) & (i_funct3 == 3'b000)) ? i_funct7[5]    : 1'b0;
-    assign o_alu_sign_sel =     ((is_reg_arith_instr | is_immed_arith_instr) & (i_funct3 == 3'b011)) ? 1'b1           : (is_branch_instr) ? i_funct3[1]   : 1'b0;
-    assign o_alu_arith_sel =    ((is_reg_arith_instr | is_immed_arith_instr) & (i_funct3 == 3'b101)) ? i_funct7[5]    : 1'b0;
+    assign o_alu_input_sel  =    is_immed_arith_instr | is_mem_load_instr | is_mem_store_instr | is_jump_link_instr;                 // Set when an immed is used
+    assign o_alu_op_sel[0]  =    (is_reg_arith_instr | is_immed_arith_instr) ? (i_funct3[0] | (i_funct3 == 3'b010))  : 1'b0;        
+    assign o_alu_op_sel[1]  =    (is_reg_arith_instr | is_immed_arith_instr) ? i_funct3[1]                           : 1'b0;
+    assign o_alu_op_sel[2]  =    (is_reg_arith_instr | is_immed_arith_instr) ? i_funct3[2]                           : 1'b0;
+    assign o_alu_sub_sel    =    ((is_reg_arith_instr) & (i_funct3 == 3'b000)) ? i_funct7[5]    : 1'b0;
+    assign o_alu_sign_sel   =    ((is_reg_arith_instr | is_immed_arith_instr) & (i_funct3 == 3'b011)) ? 1'b1           : (is_branch_instr) ? i_funct3[1]   : 1'b0;
+    assign o_alu_arith_sel  =    ((is_reg_arith_instr | is_immed_arith_instr) & (i_funct3 == 3'b101)) ? i_funct7[5]    : 1'b0;
 
     // PC Select Control
-    assign o_jump_type_sel =    is_jump_link_instr;
-    assign o_jump_sel =         is_jump_link_instr | is_jump_instr;
+    assign o_jump_addr_sel  = is_jump_link_instr;
+    assign o_jump_sel       = is_jump_link_instr | is_jump_instr;
+    assign o_branch_sel     = is_branch_instr;
 
     // Data Memory Control
     assign o_dmem_wr_en =       is_mem_store_instr;
@@ -92,8 +94,20 @@ module cntrUnit(
     assign pc_change_instr = is_branch_instr | is_jump_instr | is_jump_link_instr;
     wire exe_wr_to_rd;
     wire mem_wr_to_rd;
-    assign exe_wr_to_rd = i_exe_wr_en & ((i_exe_wr_addr == i_rs1_addr) | (i_exe_wr_addr == i_rs2_addr));
-    assign mem_wr_to_rd = i_mem_wr_en & ((i_mem_wr_addr == i_rs1_addr) | (i_mem_wr_addr == i_rs2_addr));
+    // DEBUG LINES
+    wire exe_wr_addr_eq_rs1; 
+    assign exe_wr_addr_eq_rs1 = (i_exe_wr_addr == i_rs1_addr);
+    wire exe_wr_addr_eq_rs2;
+    assign exe_wr_addr_eq_rs2 = (i_exe_wr_addr == i_rs2_addr);
+    wire mem_wr_addr_eq_rs1; 
+    assign mem_wr_addr_eq_rs1 = (i_mem_wr_addr == i_rs1_addr);
+    wire mem_wr_addr_eq_rs2;
+    assign mem_wr_addr_eq_rs2 = (i_mem_wr_addr == i_rs2_addr);
+
+
+
+    assign exe_wr_to_rd = i_exe_wr_en & ( exe_wr_addr_eq_rs1 | (exe_wr_addr_eq_rs2 & !o_alu_input_sel));
+    assign mem_wr_to_rd = i_mem_wr_en & ( mem_wr_addr_eq_rs1 | (mem_wr_addr_eq_rs2 & !o_alu_input_sel));
     assign o_stall =  pc_change_instr | (!pc_change_instr &  (exe_wr_to_rd | mem_wr_to_rd));
 
 endmodule

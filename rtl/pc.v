@@ -1,7 +1,7 @@
 `default_nettype none
 
 module pc #(
-    parameter RESET_ADDR = 32'h00000000
+    parameter RESET_ADDR = 32'h0000_0000
 ) (
     input wire          i_clk,
     input wire          i_rst,

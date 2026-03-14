@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 module hart_tb #(
-    parameter DEBUG = 0
+    parameter DEBUG = 1
 ) ();
     // Synchronous active-high reset.
     reg         clk, rst;

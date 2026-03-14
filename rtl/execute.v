@@ -3,6 +3,7 @@
 module exe(
     input wire          i_clk,
     input wire          i_rst,
+    input wire          i_stall,
 
     // CONTROL SIGNALS
     // Alu Control
@@ -12,8 +13,9 @@ module exe(
     input wire          i_alu_sign_sel,
     input wire          i_alu_arith_sel,
     // PC Control
-    input wire          i_jump_type_sel,
+    input wire          i_jump_addr_sel,
     input wire          i_jump_sel,
+    input wire          i_branch_sel,
     input wire [2:0]    i_funct3,
 
     // Input Data
@@ -30,7 +32,7 @@ module exe(
 
     // PC Ouput
     output wire [31:0]  o_jump_addr,
-    output wire         o_jump_sel,
+    output wire         o_pc_sel,
     output wire [31:0]  o_next_instr_addr
 );
     // Select Alu Input
@@ -67,11 +69,12 @@ module exe(
     );
 
     // Connect PC Jump Address
-    assign o_jump_addr =    i_jump_type_sel ? {o_alu_result[31:1], 1'b0} : o_pc_immed;
+    assign o_jump_addr =    i_jump_addr_sel ? {o_alu_result[31:1], 1'b0} : o_pc_immed;
 
     // Connect Branch Control
     b_cntr branchControl(
         .i_jump(i_jump_sel),
+        .i_branch(i_branch_sel),
         .i_funct3(i_funct3),
         .i_pc_plus_4(i_pc_plus_4),
         .i_jump_addr(o_jump_addr),
@@ -79,7 +82,7 @@ module exe(
         .i_eq(equal),
         .i_slt(less_than),
 
-        .o_jump_cntr(o_jump_sel),
+        .o_pc_sel(o_pc_sel),
         .o_next_instr_addr(o_next_instr_addr)
     );
 

@@ -47,7 +47,7 @@ module hart #(
     wire [31:0] if_pc_plus_4;
     wire        id_stall;
     wire [31:0] exe_jump_instr_addr;
-    wire        exe_jump_sel;
+    wire        exe_pc_sel;
     instrFetch instructionFetch(
         .i_clk(i_clk),
         .i_rst(i_rst),
@@ -58,7 +58,7 @@ module hart #(
 
         .i_next_instr_addr(if_pc_plus_4),
         .i_jump_instr_addr(exe_jump_instr_addr),
-        .i_jump_sel(exe_jump_sel),
+        .i_jump_sel(exe_pc_sel),
 
         .o_instr(if_instr),
         .o_instr_addr(if_pc),
@@ -72,6 +72,8 @@ module hart #(
     wire [31:0] id_pc_plus_4;      // The Address of the subsequent instruction
     if_id_reg if_id_register(
         .i_clk(i_clk),
+        .i_rst(i_rst),
+        
         .i_instr(if_instr),
         .i_imem_raddr(o_imem_raddr),
         .i_pc(if_pc),
@@ -88,7 +90,7 @@ module hart #(
     wire [31:0] id_reg_rs1_data, id_reg_rs2_data, id_immed;         // Values
     wire [2:0]  id_alu_op_sel;                  // ALU Control Signals                                
     wire        id_alu_input_sel, id_alu_sub_sel, id_alu_sign_sel, id_alu_arith_sel;
-    wire        id_jump_type_sel, id_jump_sel;  // Jump Control Signal
+    wire        id_jump_addr_sel, id_jump_sel, id_branch_sel;  // Jump Control Signal
     wire        id_dmem_wr_en, id_dmem_rd_en;   // Dmem Control Signals
     wire [2:0]  id_reg_wr_sel;                  // Write Back Control Signal
     wire        id_reg_wr_en;
@@ -128,8 +130,9 @@ module hart #(
         .o_alu_sign_sel(id_alu_sign_sel),
         .o_alu_arith_sel(id_alu_arith_sel),
 
-        .o_jump_type_sel(id_jump_type_sel),
+        .o_jump_addr_sel(id_jump_addr_sel),
         .o_jump_sel(id_jump_sel),
+        .o_branch_sel(id_branch_sel),
 
         .o_dmem_wr_en(id_dmem_wr_en),
         .o_dmem_rd_en(id_dmem_rd_en),
@@ -155,7 +158,7 @@ module hart #(
     wire [31:0] exe_reg_rs1_data, exe_reg_rs2_data, exe_immed;         // Values
     wire [2:0]  exe_alu_op_sel;                  // ALU Control Signals                                
     wire        exe_alu_input_sel, exe_alu_sub_sel, exe_alu_sign_sel, exe_alu_arith_sel;
-    wire        exe_jump_type_sel;  // Jump Control Signal
+    wire        exe_jump_sel, exe_jump_addr_sel, exe_branch_sel;  // Jump Control Signal
     wire        exe_dmem_wr_en, exe_dmem_rd_en;   // Dmem Control Signals
     wire [2:0]  exe_reg_wr_sel;                  // Write Back Control Signal
     wire        exe_halt_signal, exe_trap_signal, exe_stall; // Instruction Control Signals
@@ -165,6 +168,7 @@ module hart #(
     wire [31:0] exe_next_instr_addr;
     id_exe_reg id_exe_register(
         .i_clk(i_clk),
+        .i_rst(i_rst),
 
         .i_instr(id_instr),
         .i_imem_raddr(id_imem_raddr),
@@ -182,8 +186,9 @@ module hart #(
         .i_alu_sub_sel(id_alu_sub_sel),
         .i_alu_sign_sel(id_alu_sign_sel),
         .i_alu_arith_sel(id_alu_arith_sel),
-        .i_jump_type_sel(id_jump_type_sel),
+        .i_jump_addr_sel(id_jump_addr_sel),
         .i_jump_sel(id_jump_sel),
+        .i_branch_sel(id_branch_sel),
         .i_dmem_wr_en(id_dmem_wr_en),
         .i_dmem_rd_en(id_dmem_rd_en),
         .i_reg_wr_sel(id_reg_wr_sel),
@@ -211,8 +216,9 @@ module hart #(
         .o_alu_sub_sel(exe_alu_sub_sel),
         .o_alu_sign_sel(exe_alu_sign_sel),
         .o_alu_arith_sel(exe_alu_arith_sel),
-        .o_jump_type_sel(exe_jump_type_sel),
+        .o_jump_addr_sel(exe_jump_addr_sel),
         .o_jump_sel(exe_jump_sel),
+        .o_branch_sel(exe_branch_sel),
         .o_dmem_wr_en(exe_dmem_wr_en),
         .o_dmem_rd_en(exe_dmem_rd_en),
         .o_reg_wr_sel(exe_reg_wr_sel),
@@ -230,6 +236,7 @@ module hart #(
     exe execution(
         .i_clk(i_clk),
         .i_rst(i_rst),
+        .i_stall(exe_stall),
 
         .i_alu_input_sel(exe_alu_input_sel),
         .i_alu_op_sel(exe_alu_op_sel),
@@ -237,8 +244,9 @@ module hart #(
         .i_alu_sign_sel(exe_alu_sign_sel),
         .i_alu_arith_sel(exe_alu_arith_sel),
         
-        .i_jump_type_sel(exe_jump_type_sel),
+        .i_jump_addr_sel(exe_jump_addr_sel),
         .i_jump_sel(exe_jump_sel),
+        .i_branch_sel(exe_branch_sel),
         .i_funct3(exe_funct3),
 
         .i_reg_rs1_data(exe_reg_rs1_data),
@@ -251,7 +259,7 @@ module hart #(
         .o_alu_result(exe_alu_result),
         .o_jump_addr(exe_jump_instr_addr),
         .o_pc_immed(exe_pc_immed),
-        .o_jump_sel(exe_jump_sel),
+        .o_pc_sel(exe_pc_sel),
         .o_next_instr_addr(exe_next_instr_addr)
     );
 
@@ -276,6 +284,7 @@ module hart #(
     wire [31:0]     mem_alu_result, mem_pc_immed, mem_next_instr_addr;
     exe_mem_reg exe_mem_register(
         .i_clk(i_clk),
+        .i_rst(i_rst),
 
         .i_instr(exe_instr),
         .i_imem_raddr(exe_imem_raddr),
@@ -375,6 +384,7 @@ module hart #(
     wire [31:0] wr_dmem_out;
     mem_wr_reg mem_wr_register(
         .i_clk(i_clk),
+        .i_rst(i_rst),
 
         .i_instr(mem_instr),
         .i_imem_raddr(mem_imem_raddr),
@@ -461,7 +471,6 @@ module hart #(
     assign o_retire_inst        = !wr_stall             ? wr_instr              : 32'h0000_0000;
     assign o_retire_trap        = !wr_stall             ? wr_trap_signal        : 1'b0;
     assign o_retire_halt        = !wr_stall             ? wr_halt_signal        : 1'b0;
-    assign o_retire_rd_wdata    = !wr_stall             ? wr_reg_wr_data        : 32'h0000_0000;
     assign o_retire_pc          = !wr_stall             ? wr_pc                 : 32'h0000_0000;
     assign o_retire_next_pc     = !wr_stall             ? wr_next_instr_addr    : 32'h0000_0000;
     assign o_retire_rd_waddr    = (!wr_stall & rd_wr)   ? wr_reg_rd_addr        : 5'b00000;        

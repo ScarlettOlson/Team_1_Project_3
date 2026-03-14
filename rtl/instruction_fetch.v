@@ -18,7 +18,7 @@ module instrFetch(
     output wire [31:0]  o_incr_instr_addr
 );  
     // Deside what the next Instruction will be
-    wire [31:0] next_instr =    i_jump_sel ? i_jump_instr_addr : i_next_instr_addr;
+    wire [31:0] selected_instr =    i_jump_sel ? i_jump_instr_addr : i_next_instr_addr;
     
     // Get the current instruction from the pc and write the new instruction
     wire [31:0] instr_addr;
@@ -26,7 +26,7 @@ module instrFetch(
         .i_clk(i_clk),
         .i_rst(i_rst),
         .i_stall(i_stall),
-        .i_next(next_instr),
+        .i_next(selected_instr),
         .o_current(instr_addr)
     );
 

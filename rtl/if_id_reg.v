@@ -3,6 +3,7 @@
 
 module if_id_reg (
     input wire        i_clk,
+    input wire        i_rst,
     
     input wire [31:0] i_instr,
     input wire [31:0] i_imem_raddr,
@@ -21,10 +22,17 @@ module if_id_reg (
 
 
     always@(posedge i_clk) begin
-        instr       <= i_instr;
-        imem_raddr     <= i_imem_raddr;
-        pc          <= i_pc;
-        pc_plus_4   <= i_pc_plus_4;
+        if(i_rst) begin
+          instr         <= 32'b0;
+          imem_raddr    <= 32'b0;
+          pc            <= 32'b0;
+          pc_plus_4     <= 32'b0;
+        end else begin
+            instr       <= i_instr;
+            imem_raddr  <= i_imem_raddr;
+            pc          <= i_pc;
+            pc_plus_4   <= i_pc_plus_4;
+        end
     end
 
     assign o_instr      = instr;

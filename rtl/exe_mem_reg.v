@@ -2,6 +2,7 @@
 
 module exe_mem_reg (
     input wire          i_clk,
+    input wire          i_rst,
 
     // From IF Stage
     input wire [31:0]   i_instr,
@@ -72,30 +73,64 @@ module exe_mem_reg (
     reg [31:0] alu_result, pc_immed, next_instr_addr;
 
     always @(posedge i_clk) begin
-        instr           <=    i_instr;
-        imem_raddr      <=    i_imem_raddr;
-        pc              <=    i_pc;
+        if (i_rst) begin
+            // IF stage
+            instr           <= 32'b0;
+            imem_raddr      <= 32'b0;
+            pc              <= 32'b0;
 
-        reg_rd_addr     <=    i_reg_rd_addr;
-        reg_rs1_addr    <=    i_reg_rs1_addr;
-        reg_rs2_addr    <=    i_reg_rs2_addr;
-        reg_rs1_data    <=    i_reg_rs1_data;
-        reg_rs2_data    <=    i_reg_rs2_data;
-        immed           <=    i_immed;
-        dmem_wr_en      <=    i_dmem_wr_en;
-        dmem_rd_en      <=    i_dmem_rd_en;
-        reg_wr_sel      <=    i_reg_wr_sel;
-        reg_wr_en       <=    i_reg_wr_en;
-        halt_signal     <=    i_halt_signal;
-        trap_signal     <=    i_trap_signal;
-        stall           <=    i_stall;
-        funct3          <=    i_funct3;
-        instr_format    <=    i_instr_format;
+            // ID stage
+            reg_rd_addr     <= 5'b0;
+            reg_rs1_addr    <= 5'b0;
+            reg_rs2_addr    <= 5'b0;
+            reg_rs1_data    <= 32'b0;
+            reg_rs2_data    <= 32'b0;
+            immed           <= 32'b0;
+            dmem_wr_en      <= 1'b0;
+            dmem_rd_en      <= 1'b0;
+            reg_wr_sel      <= 3'b0;
+            reg_wr_en       <= 1'b0;
+            halt_signal     <= 1'b0;
+            trap_signal     <= 1'b0;
+            stall           <= 1'b0;
+            funct3          <= 3'b0;
+            instr_format    <= 6'b0;
 
-        alu_result      <=    i_alu_result;
-        pc_immed        <=    i_pc_immed;
-        next_instr_addr <=  i_next_instr_addr;
+            // EXE stage
+            alu_result      <= 32'b0;
+            pc_immed        <= 32'b0;
+            next_instr_addr <= 32'b0;
+
+        end else begin
+            // IF stage
+            instr           <= i_instr;
+            imem_raddr      <= i_imem_raddr;
+            pc              <= i_pc;
+
+            // ID stage
+            reg_rd_addr     <= i_reg_rd_addr;
+            reg_rs1_addr    <= i_reg_rs1_addr;
+            reg_rs2_addr    <= i_reg_rs2_addr;
+            reg_rs1_data    <= i_reg_rs1_data;
+            reg_rs2_data    <= i_reg_rs2_data;
+            immed           <= i_immed;
+            dmem_wr_en      <= i_dmem_wr_en;
+            dmem_rd_en      <= i_dmem_rd_en;
+            reg_wr_sel      <= i_reg_wr_sel;
+            reg_wr_en       <= i_reg_wr_en;
+            halt_signal     <= i_halt_signal;
+            trap_signal     <= i_trap_signal;
+            stall           <= i_stall;
+            funct3          <= i_funct3;
+            instr_format    <= i_instr_format;
+
+            // EXE stage
+            alu_result      <= i_alu_result;
+            pc_immed        <= i_pc_immed;
+            next_instr_addr <= i_next_instr_addr;
+        end
     end
+
 
     // Outputs
     assign o_instr              = instr;
