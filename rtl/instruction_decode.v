@@ -56,8 +56,8 @@ module instrDecode(
     wire [2:0] funct3;
     wire [6:0] funct7;
     assign opcode =         i_instr[6:0];
-    assign o_funct3 =       i_instr[14:12];
-    assign o_funct7 =       i_instr[31:25];
+    assign funct3 =       i_instr[14:12];
+    assign funct7 =       i_instr[31:25];
 
     // Connect Register File
     wire [4:0] rs1_addr;
@@ -66,9 +66,7 @@ module instrDecode(
     assign rs1_addr =       i_instr[19:15];
     assign rs2_addr =       i_instr[24:20];
     assign rd_addr =        i_instr[11:7];
-    assign o_reg_addr_1 =   rs1_addr;
-    assign o_reg_addr_2 =   rs2_addr;
-    assign o_reg_addr_wr =  rd_addr;
+    
     rf registerFile(
         .i_clk(i_clk),
         .i_rst(i_rst),
@@ -132,6 +130,12 @@ module instrDecode(
         .i_format(instr_format),
         .o_immediate(o_immed)
     );
+
+    assign o_funct3 =       !o_stall ? funct3   : 3'b0;
+    assign o_funct7 =       !o_stall ? funct7   : 7'b0;
+    assign o_reg_addr_1 =   !o_stall ? rs1_addr : 5'b0;
+    assign o_reg_addr_2 =   !o_stall ? rs2_addr : 5'b0;
+    assign o_reg_addr_wr =  !o_stall ? rd_addr  : 5'b0;
 
     // Output the instruction format code
     assign o_format = instr_format;

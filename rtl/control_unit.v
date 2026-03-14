@@ -87,7 +87,7 @@ module cntrUnit(
     assign o_reg_wr_sel[0] =    is_auipc_instr | is_mem_load_instr; // Set then selector is 1 or 3
     assign o_reg_wr_sel[1] =    is_upper_immed_instr;               // Set when the selector is 2 or 3
     assign o_reg_wr_sel[2] =    is_jump_instr | is_jump_link_instr; // Set when the selector is 4
-    assign o_reg_wr_en =        is_reg_arith_instr | is_immed_arith_instr | is_upper_immed_instr | is_mem_load_instr | is_jump_instr | is_jump_link_instr;
+    assign o_reg_wr_en =        !o_stall & (is_reg_arith_instr | is_immed_arith_instr | is_upper_immed_instr | is_mem_load_instr | is_jump_instr | is_jump_link_instr);
     
     // Determine If the instruction should stall
     wire pc_change_instr;
